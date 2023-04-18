@@ -1,0 +1,5 @@
+.env
+back/vendor
+back/.htaccess
+tarteaucitronjs
+back/.env

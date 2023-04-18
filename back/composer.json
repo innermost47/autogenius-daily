@@ -1,0 +1,14 @@
+{
+    "autoload": {
+      "psr-4": {
+        "App\\Utilities\\": "src/Utilities/",
+        "App\\Model\\": "src/Model/",
+        "App\\Controller\\": "src/Controller/",
+        "App\\Service\\": "src/Service/"
+      }
+    },
+    "require": {
+      "vlucas/phpdotenv": "^5.5",
+      "firebase/php-jwt": "^6.4"
+    }
+  }

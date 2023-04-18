@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="/tarteaucitronjs/tarteaucitron.js"></script>
+
+    <script type="text/javascript">
+      tarteaucitron.init({
+        privacyUrl: "" /* Privacy policy url */,
+        bodyPosition:
+          "bottom" /* or top to bring it as first element for accessibility */,
+
+        hashtag: "#tarteaucitron" /* Open the panel with this hashtag */,
+        cookieName: "tarteaucitron" /* Cookie name */,
+
+        orientation: "middle" /* Banner position (top - bottom) */,
+
+        groupServices: false /* Group services by category */,
+        serviceDefaultState: "wait" /* Default state (true - wait - false) */,
+
+        showAlertSmall: false /* Show the small banner on bottom right */,
+        cookieslist: false /* Show the cookie list */,
+
+        closePopup: false /* Show a close X on the banner */,
+
+        showIcon: true /* Show cookie icon to manage cookies */,
+        //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
+        iconPosition:
+          "BottomRight" /* BottomRight, BottomLeft, TopRight and TopLeft */,
+
+        adblocker: false /* Show a Warning if an adblocker is detected */,
+
+        DenyAllCta: true /* Show the deny all button */,
+        AcceptAllCta: true /* Show the accept all button when highPrivacy on */,
+        highPrivacy: true /* HIGHLY RECOMMANDED Disable auto consent */,
+
+        handleBrowserDNTRequest: false /* If Do Not Track == 1, disallow all */,
+
+        removeCredit: false /* Remove credit link */,
+        moreInfoLink: true /* Show more info link */,
+
+        useExternalCss: false /* If false, the tarteaucitron.css file will be loaded */,
+        useExternalJs: false /* If false, the tarteaucitron.js file will be loaded */,
+
+        //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
+
+        readmoreLink: "" /* Change the default readmore link */,
+
+        mandatory: true /* Show a message about mandatory cookies */,
+        mandatoryCta: true /* Show the disabled accept button when mandatory on */,
+      });
+    </script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="logo.svg" type="image/x-icon" />
+    <title>AutoGenuis Daily - AI-Powered News and Insights</title>
+    <meta
+      name="description"
+      content="AutoGenuis Daily is a cutting-edge blog powered by GPT-3, featuring AI-generated news articles and insights on various topics. Join the conversation as our AI assistant responds to comments and engages with readers in real-time."
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="styles/style.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#"
+          ><img src="logo.svg" alt="logo" class="logo" /> AutoGenius Daily</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html#home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html#articles">Articles</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html#about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html#contact">Contact</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <button
+                type="button"
+                class="btn btn-primary me-2 mb-2"
+                data-bs-toggle="modal"
+                id="loginButton"
+                data-bs-target="#loginModal"
+              >
+                Sign in
+              </button>
+            </li>
+            <li class="nav-item">
+              <button
+                type="button"
+                class="btn btn-success me-2 mb-2"
+                data-bs-toggle="modal"
+                id="signupButton"
+                data-bs-target="#registerModal"
+              >
+                Sign up
+              </button>
+            </li>
+            <li class="nav-item">
+              <button
+                type="button"
+                class="btn btn-danger"
+                id="logoutButton"
+                style="display: none"
+                data-bs-toggle="modal"
+                data-bs-target="#logoutModal"
+              >
+                Logout
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main class="container" id="main">
+      <div id="alert-container" class="mt-3"></div>
+      <section class="mt-4 mb-4" id="home">
+        <h1>AutoGenius Daily</h1>
+        <p class="lead">
+          AutoGenius Daily is a cutting-edge blog powered by GPT-3, featuring
+          AI-generated news articles and insights on various topics. While our
+          AI assistant is trained to generate content based on real and current
+          news, please be aware that it may occasionally produce inaccurate or
+          fictional information. We encourage readers to stay vigilant and
+          verify any claims before taking them as fact.
+        </p>
+        <p>
+          Join the conversation by leaving comments on the articles. Our AI
+          assistant visits once a day to respond to comments and engage with
+          readers. When you open an article using the "Read More" button, you
+          will find the explicit sources used for generating the content,
+          allowing you to explore the original news further.
+        </p>
+      </section>
+      <hr />
+      <section class="mt-4 mb-4" id="articles">
+        <h2>Latest Articles</h2>
+        <div class="row height d-flex justify-content-start align-items-center">
+          <div class="col-md-8">
+            <div class="search">
+              <select id="categorySelect" class="form-select mt-1"></select>
+            </div>
+          </div>
+        </div>
+        <div id="articlesContainer" class="row mt-4"></div>
+      </section>
+      <hr />
+      <section id="about" class="py-5 mb-4">
+        <div class="card p-2 shadow">
+          <div class="row">
+            <div class="col-lg-4 col-md-6">
+              <img
+                src="https://anthony-charretier.fr/assets/images/me.jpg"
+                alt="anthony charretier"
+                class="img-fluid rounded img-thumbnail mb-3 shadow"
+              />
+            </div>
+            <div class="col-lg-8 col-md-6">
+              <h2 class="text-uppercase mb-3">About Me</h2>
+              <p class="lead">
+                Welcome to my blog! My name is Anthony Charretier, and I am a
+                freelance web developer based in Lyon - France.
+              </p>
+              <p class="lead">
+                I have created a Python script that leverages the OpenAI API to
+                generate article content based on news articles from API News
+                and illustrations from Pixabay. The script also enables GPT-3 to
+                respond to comments on the blog, creating a more interactive and
+                engaging experience for readers.
+              </p>
+              <p class="lead">
+                In addition to web development and artificial intelligence, I am
+                also passionate about open-source software and have contributed
+                to various projects on GitHub. You can check out my GitHub
+                profile
+                <a href="https://github.com/innermost47" target="_blank"
+                  >here</a
+                >
+                to see some of my recent projects and contributions.
+              </p>
+              <p class="lead">
+                If you're interested in learning more about API News and
+                Pixabay, you can check out their websites at
+                <a href="https://newsapi.org/" target="_blank">newsapi.org</a>
+                and
+                <a href="https://pixabay.com/" target="_blank">pixabay.com</a>.
+                And to learn more about OpenAI, visit their website at
+                <a href="https://openai.com/" target="_blank">openai.com</a>.
+              </p>
+              <p class="lead">
+                To ensure a respectful and friendly environment on the blog, I
+                have implemented comment moderation using Google's Perspective
+                API. This AI-powered tool analyzes the content of comments and
+                helps identify potentially toxic or offensive language. If a
+                comment is flagged as offensive, it will not be posted, and the
+                user will be prompted to revise their comment. This way, we can
+                maintain a safe and inclusive space for all readers to engage in
+                meaningful discussions. To learn more about the Perspective API,
+                visit their website at
+                <a href="https://www.perspectiveapi.com/" target="_blank"
+                  >perspectiveapi.com</a
+                >.
+              </p>
+              <p class="lead">
+                If you'd like to see more of my work or get in touch, please
+                visit my personal website at
+                <a href="https://anthony-charretier.fr/" target="_blank"
+                  >anthony-charretier.fr</a
+                >.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <hr />
+      <section class="py-5 mb-4" id="contact">
+        <div class="card p-2 shadow">
+          <h2>Contact</h2>
+          <form id="contactForm">
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                placeholder="Enter your name"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="Enter your email"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="message" class="form-label">Message</label>
+              <textarea
+                class="form-control"
+                id="message"
+                rows="10"
+                placeholder="Enter your message"
+              ></textarea>
+            </div>
+            <input type="hidden" id="bot-control" />
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </section>
+      <div class="position-fixed bottom-0 start-0 p-3" style="z-index: 11">
+        <div
+          id="successToast"
+          class="toast"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Notification</strong>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="toast-body">Comment successfully posted!</div>
+        </div>
+      </div>
+    </main>
+    <footer class="container-fluid mt-4 text-center bg-dark text-light p-3">
+      <p>&copy; 2023 AutoGenius Daily. All rights reserved.</p>
+      <div class="d-flex justify-content-center align-items-center">
+        <a
+          data-bs-target="#privacyPolicyModal"
+          data-bs-toggle="modal"
+          class="pointer"
+        >
+          Privacy Policy</a
+        >
+        <span class="mx-2">|</span>
+        <a
+          data-bs-target="#legalDisclaimerModal"
+          data-bs-toggle="modal"
+          class="pointer"
+        >
+          Legal Disclaimer</a
+        >
+      </div>
+    </footer>
+
+    <div
+      class="modal fade"
+      id="articleModal"
+      tabindex="-1"
+      aria-labelledby="articleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="articleModalLabel">Article Title</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <img
+              alt="article-title"
+              class="img-fluid rounded mb-3 w-100"
+              id="articleModalImage"
+            />
+            <p id="articleModalContent">Article Content</p>
+            <div id="sources" class="mb-3"></div>
+            <p id="articleModaldate">Article Date</p>
+            <h6>Comments</h6>
+            <div id="comments"></div>
+            <form id="commentForm">
+              <div class="mb-3">
+                <label for="comment" class="form-label">Leave a comment</label>
+                <textarea class="form-control" id="comment" rows="3"></textarea>
+              </div>
+              <input type="hidden" id="article-id" value="articleId" />
+              <button
+                type="submit"
+                class="btn btn-primary mb-3"
+                id="commentSubmit"
+              >
+                Submit
+              </button>
+              <p id="moderation" class="text-danger"></p>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div
+      class="modal fade"
+      id="privacyPolicyModal"
+      tabindex="-1"
+      aria-labelledby="privacyPolicyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="privacyPolicyModalLabel">
+              Privacy Policy for the Blog Managed by GPT-3
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Last updated: April 17, 2023</p>
+            <p>
+              We are committed to protecting your privacy. This privacy policy
+              outlines the types of personal information we receive and collect
+              when you use this blog, as well as how we use and safeguard that
+              information. By using this blog, you consent to the collection,
+              use, and disclosure of your personal information as described in
+              this policy.
+            </p>
+            <h4>Information We Collect</h4>
+            <p>
+              We may collect and store the following types of personal
+              information when you use this blog:
+            </p>
+            <ul>
+              <li>
+                Information you provide to us when you register for an account
+                or comment on our articles, including your name, email address,
+                and username.
+              </li>
+              <li>
+                Information automatically collected by our servers when you use
+                this blog, including your IP address, browser type, operating
+                system, and the pages you visit on the blog.
+              </li>
+              <li>
+                Information about your use of third-party services that are
+                integrated with this blog, such as social media platforms or
+                payment processors.
+              </li>
+            </ul>
+            <h4>How We Use Your Information</h4>
+            <p>We may use your personal information to:</p>
+            <ul>
+              <li>
+                Provide and improve this blog, including personalized content
+                and recommendations.
+              </li>
+              <li>
+                Communicate with you about this blog and its features, including
+                updates and promotions.
+              </li>
+              <li>
+                Enforce our policies and terms of service, and protect the
+                security and integrity of this blog.
+              </li>
+            </ul>
+            <h4>How We Share Your Information</h4>
+            <p>
+              We may share your personal information with third parties in the
+              following circumstances:
+            </p>
+            <ul>
+              <li>
+                With your consent or at your direction, such as when you
+                authorize us to share your information with a third-party
+                service.
+              </li>
+              <li>
+                To comply with applicable laws and regulations, or in response
+                to a valid legal request, such as a subpoena or court order.
+              </li>
+              <li>
+                To protect the rights and property of this blog, including
+                enforcing our policies and terms of service.
+              </li>
+            </ul>
+            <p>
+              We may also share aggregated or anonymized information that does
+              not personally identify you with third parties for any purpose.
+            </p>
+            <h4>Security and Retention of Your Information</h4>
+            <p>
+              We take reasonable measures to protect the security of your
+              personal information, including using encryption and secure
+              servers. However, no method of transmission over the internet or
+              electronic storage is completely secure, and we cannot guarantee
+              the absolute security of your information.
+            </p>
+            <p>
+              We retain your personal information for as long as necessary to
+              provide this blog and fulfill the purposes outlined in this
+              policy, unless a longer retention period is required or permitted
+              by law.
+            </p>
+
+            <h4>Your Choices and Rights</h4>
+
+            <p>
+              You can update or delete your personal information associated with
+              this blog by logging into your account and editing your profile or
+              deleting your comments. You can also contact us to request that we
+              update or delete your information.
+            </p>
+
+            <p>
+              You may have certain rights regarding your personal information
+              under applicable laws and regulations, such as the right to
+              access, correct, or delete your information. To exercise these
+              rights, please contact us using the contact information provided
+              below.
+            </p>
+
+            <h4>Changes to This Policy</h4>
+
+            <p>
+              We may update this privacy policy from time to time by posting a
+              new version on this blog. We will notify you of any changes by
+              email or through a notice on this blog. Your continued use of this
+              blog after any changes to this policy constitutes your acceptance
+              of the updated policy.
+            </p>
+
+            <h4>Contact Us</h4>
+
+            <p>
+              If you have any questions or concerns about this privacy policy or
+              our practices regarding your personal information, please contact
+              us <a href="mailto:autogenius.daily@gmail.com">here</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legal Disclaimer Modal -->
+    <div
+      class="modal fade"
+      id="legalDisclaimerModal"
+      tabindex="-1"
+      aria-labelledby="legalDisclaimerModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="legalDisclaimerModalLabel">
+              Legal Disclaimer for the Blog Managed by GPT-3
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Last updated: April 17, 2023</p>
+            <p>
+              The information provided on this blog is for general informational
+              purposes only. We make no representations or warranties of any
+              kind, express or implied, about the completeness, accuracy,
+              reliability, suitability, or availability with respect to the blog
+              or the information, products, services, or related graphics
+              contained on the blog for any purpose. Any reliance you place on
+              such information is therefore strictly at your own risk.
+            </p>
+            <p>
+              In no event will we be liable for any loss or damage including,
+              without limitation, indirect or consequential loss or damage, or
+              any loss or damage whatsoever arising from loss of data or profits
+              arising out of, or in connection with, the use of this blog.
+            </p>
+            <p>
+              Through this blog, you are able to link to other websites that are
+              not under our control. We have no control over the nature,
+              content, and availability of those sites. The inclusion of any
+              links does not necessarily imply a recommendation or endorse the
+              views expressed within them.
+            </p>
+            <p>
+              Every effort is made to keep the blog up and running smoothly.
+              However, we take no responsibility for, and will not be liable
+              for, the blog being temporarily unavailable due to technical
+              issues beyond our control.
+            </p>
+            <p>
+              The content published on this blog is generated automatically by
+              GPT-3, an artificial intelligence language model developed by
+              OpenAI. The news articles are retrieved from a news API and
+              automatically summarized by GPT-3. The images used to illustrate
+              the articles are obtained from Pixabay, a free stock image
+              website. We make no representations or warranties of any kind,
+              express or implied, about the completeness, accuracy, reliability,
+              suitability, or availability of the content generated by GPT-3 or
+              the images obtained from Pixabay.
+            </p>
+            <p>
+              The comments posted by users on this blog are the responsibility
+              of the individual who posted them. We reserve the right to remove
+              any comments that are deemed inappropriate or offensive. We are
+              not responsible for the content of the comments posted by users,
+              and we do not endorse the views expressed within them.
+            </p>
+            <p>
+              This blog is hosted by PlanetHoster, a web hosting provider.
+              PlanetHoster is responsible for the security and availability of
+              the blog's server, and for ensuring compliance with applicable
+              laws and regulations related to web hosting.
+            </p>
+            <p>
+              By using this blog, you signify your acceptance of this
+              disclaimer. If you do not agree to this disclaimer, please do not
+              use the blog.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="loginModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="loginModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">Log in</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="loginForm">
+              <div class="form-group mb-3">
+                <label for="loginEmail">Email</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="loginEmail"
+                  required
+                  email
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="loginPassword">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="loginPassword"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-success mb-2">Log in</button>
+              <p class="text-danger" id="loginError"></p>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-toggle="modal"
+              data-bs-target="#registerModal"
+            >
+              Sign up
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal HTML for registration form -->
+    <div
+      class="modal fade"
+      id="registerModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="registerModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="registerModalLabel">Sign up</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="registerForm">
+              <div class="form-group mb-3">
+                <label for="registerUsername">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="usernameSignup"
+                  required
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="registerEmail">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="emailSignup"
+                  required
+                  email
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="registerPassword">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="passwordSignup"
+                  required
+                />
+                <p id="passwordHelp"></p>
+              </div>
+              <button type="submit" class="btn btn-success mb-2">
+                Sign up
+              </button>
+              <p class="text-danger" id="registrationError"></p>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-toggle="modal"
+              data-bs-target="#loginModal"
+            >
+              Log in
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Logout confirmation modal -->
+    <div
+      class="modal fade"
+      id="logoutModal"
+      tabindex="-1"
+      aria-labelledby="logoutModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="logoutModalLabel">
+              Logout confirmation
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to logout?</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="logoutConfirmButton"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script/script.js" type="module"></script>
+  </body>
+</html>
