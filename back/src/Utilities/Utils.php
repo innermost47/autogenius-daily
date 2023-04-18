@@ -67,4 +67,17 @@ class Utils
 
         return $score;
     }
+
+    public static function convertHtmlEntities($data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = Utils::convertHtmlEntities($value);
+            }
+        } else if (is_string($data)) {
+            $data = html_entity_decode($data, ENT_QUOTES, 'UTF-8');
+        }
+
+        return $data;
+    }
 }

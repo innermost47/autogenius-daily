@@ -4,3 +4,4 @@ back/.htaccess
 front/tarteaucitronjs
 back/.env
 front/.htaccess
+dump.sql

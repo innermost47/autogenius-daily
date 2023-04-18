@@ -39,8 +39,8 @@ class ArticleController
                     $article = $this->model->getOne($id);
                     $comments = $this->comment->getCommentsByArticleId($id);
                     $data = [
-                        'article' => $article,
-                        'comments' => $comments,
+                        'article' => Utils::convertHtmlEntities($article),
+                        'comments' => Utils::convertHtmlEntities($comments),
                     ];
                 } elseif ($category) {
                     $category = $this->category->getOne($category);
@@ -48,7 +48,7 @@ class ArticleController
                 } else {
                     $data = $this->model->getAll();
                 }
-                echo json_encode($data);
+                echo json_encode(Utils::convertHtmlEntities($data));
                 break;
             case 'POST':
                 $token = $_POST['token'] ?? null;

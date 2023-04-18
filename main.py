@@ -8,6 +8,7 @@ import urllib.parse
 import json
 import os
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -152,9 +153,49 @@ def generate_response(short_content, comments):
 
     return response.choices[0].text.strip()
 
+def clean_string(s):
+    # Supprimer les caractères de retour à la ligne et les espaces en début et fin de chaîne
+    s = s.strip().replace('\r', '').replace('\n', '')
+    # Remplacer les entités HTML courantes par leur caractère correspondant
+    s = re.sub(r'&#039;', '\x27', s)
+    s = re.sub(r'&quot;', '\x22', s)
+    s = re.sub(r'&amp;', '\x26', s)
+    s = re.sub(r'&lt;', '\x3c', s)
+    s = re.sub(r'&gt;', '\x3e', s)
+    s = re.sub(r'&nbsp;', ' ', s)
+    s = re.sub(r'&ndash;', '–', s)
+    s = re.sub(r'&mdash;', '—', s)
+    s = re.sub(r'&eacute;', 'é', s)
+    s = re.sub(r'&egrave;', 'è', s)
+    s = re.sub(r'&ecirc;', 'ê', s)
+    s = re.sub(r'&euml;', 'ë', s)
+    s = re.sub(r'&agrave;', 'à', s)
+    s = re.sub(r'&aacute;', 'á', s)
+    s = re.sub(r'&acirc;', 'â', s)
+    s = re.sub(r'&auml;', 'ä', s)
+    s = re.sub(r'&aring;', 'å', s)
+    s = re.sub(r'&aelig;', 'æ', s)
+    s = re.sub(r'&ccedil;', 'ç', s)
+    s = re.sub(r'&icirc;', 'î', s)
+    s = re.sub(r'&iuml;', 'ï', s)
+    s = re.sub(r'&ocirc;', 'ô', s)
+    s = re.sub(r'&ouml;', 'ö', s)
+    s = re.sub(r'&ugrave;', 'ù', s)
+    s = re.sub(r'&uacute;', 'ú', s)
+    s = re.sub(r'&ucirc;', 'û', s)
+    s = re.sub(r'&uuml;', 'ü', s)
+    s = re.sub(r'&yuml;', 'ÿ', s)
+    s = re.sub(r'&szlig;', 'ß', s)
+    return s
 
 def send_to_api(category, title, content, image_url, short_content, sources, token):
     api_url = f"{my_domain_url}"
+    category = clean_string(category)
+    title = clean_string(title)
+    content = clean_string(content)
+    image_url = clean_string(image_url)
+    short_content = clean_string(short_content)
+    sources = clean_string(sources)
     data = {
         "category": category,
         "title": title,
