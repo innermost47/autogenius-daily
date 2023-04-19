@@ -55,6 +55,13 @@ switch ($page) {
         $controller = new App\Controller\CommentController($model, $user_model);
         $controller->handleRequest();
         break;
+    case 'email':
+        require_once 'src/Controller/EmailController.php';
+        $model = new App\Model\Email();
+        $user_model = new App\Model\User();
+        $controller = new App\Controller\EmailController($model, $user_model);
+        $controller->handleRequest();
+        break;
     default:
         header('HTTP/1.0 404 Not Found');
         echo json_encode(['message' => 'Not Found']);
