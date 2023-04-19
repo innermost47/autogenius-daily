@@ -1,9 +1,6 @@
 import requests
 import openai
 import random
-from bs4 import BeautifulSoup
-from PIL import Image
-from io import BytesIO
 import urllib.parse
 import json
 import os
@@ -22,7 +19,6 @@ password = os.environ.get("PASSWORD")
 referer = os.environ.get("REFERER")
 
 headers = {
-    'Content-Type': 'application/json',
     'Referer': referer,
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
 }
@@ -333,7 +329,7 @@ if __name__ == "__main__":
         post_created = create_post(token)
 
         if post_created:
-            print("Post successfully created.")
+            print("Post sent.")
         else:
             print("Failed to create a post after 3 attempts. Exiting...")
             break

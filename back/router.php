@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Parse les données de php://input
 parse_str(file_get_contents("php://input"), $input_data);
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -25,7 +24,6 @@ switch ($method) {
         $id = null;
 }
 
-// Définit les contrôleurs correspondants
 switch ($page) {
     case 'articles':
         require_once 'src/Controller/ArticleController.php';
