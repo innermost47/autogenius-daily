@@ -5,7 +5,6 @@ import urllib.parse
 import json
 import os
 from dotenv import load_dotenv
-import re
 import html
 
 load_dotenv()
