@@ -73,8 +73,6 @@ def fetch_news(category):
 
     return []
 
-
-
 def fetch_image_url(query):
     url = f"https://pixabay.com/api/?key={pixabay_api_key}&q={urllib.parse.quote(query)}&image_type=photo"
     response = requests.get(url)
@@ -84,7 +82,6 @@ def fetch_image_url(query):
         random_image = random.choice(data["hits"])
         return random_image["webformatURL"]
     return None
-
 
 def summarize_news(articles):
     text_to_summarize = " ".join(
@@ -124,7 +121,6 @@ def summarize_article(article):
 
     return response.choices[0].text.strip()
 
-
 def find_title(content):
     prompt = f"Please provide a concise title for the following article: {content}"
     response = openai.Completion.create(
@@ -138,13 +134,25 @@ def find_title(content):
 
     return response.choices[0].text.strip()
 
-
 def find_image_key_word(content):
     prompt = f"Provide me with just one keyword related to the following article: {content}"
     response = openai.Completion.create(
         engine="text-davinci-002",
         prompt=prompt,
         max_tokens=20,
+        n=1,
+        stop=None,
+        temperature=0.7,
+    )
+
+    return response.choices[0].text.strip()
+
+def generate_email_response(username, message):
+    prompt = f"You are autoGenius, a news blog writer, {username} sent you this email: {message} via your blog, answer him on a professional way"
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=400,
         n=1,
         stop=None,
         temperature=0.7,
@@ -204,6 +212,17 @@ def send_response(content, article_id, token):
     response = requests.post(api_url, data=data, headers=headers)
     return response.status_code
 
+def send_email(send_to, message, token):
+    api_url = f"{my_domain_url}"
+    data = {
+        "message": Sanitizer.sanitize_input(message),
+        "email": send_to,
+        "token": token,
+        "page": "comments",
+    }
+
+    response = requests.post(api_url, data=data, headers=headers)
+    return response.status_code
 
 def login(email, password):
     api_url = f"{my_domain_url}"
@@ -219,7 +238,6 @@ def login(email, password):
         return response.json()["token"]
     return None
 
-
 def fetch_comments(token):
     api_url = f"{my_domain_url}?page=comments&token={token}"
 
@@ -230,6 +248,26 @@ def fetch_comments(token):
     else:
         print(f"Error fetching unanswered comments. Status code: {response.status_code}")
         return []
+    
+def fetch_emails(token):
+    api_url = f"{my_domain_url}?page=email&token={token}"
+
+    response = requests.get(api_url. headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Error fetching unanswered emails. Status code: {response.status_code}")
+        return []
+    
+def set_email_as_answered(email_id):
+    api_url = f"{my_domain_url}?page=email&id={email_id}&token={token}"
+    response = requests.get(api_url. headers=headers)
+
+    if response.status_code == 200:
+        print(f"Success set email {email_id} as answered. Status code: {response.status_code}")
+    else:
+        print(f"Error set email {email_id} as answered. Status code: {response.status_code}")
     
 def create_post(token):
     for post_attempts in range(3):
@@ -286,8 +324,6 @@ def create_post(token):
     print("Failed to create a post after 3 attempts.")
     return False
 
-    
-
 if __name__ == "__main__":
     token = login(email, password)
     post_created = False
@@ -315,3 +351,22 @@ if __name__ == "__main__":
                     print(f"Comments for article { article_id } replied with status code {status}")
                 else:
                     print(f"Failed to generate response for comment of article { article_id }. Skipping.")
+                    
+    unanswered_emails = fetch_emails(token)
+    
+    if(unanswered_emails):
+        for unanswerd_email in unanswered_emails:
+            email_id = unanswerd_email["id"]
+            send_to = unanswerd_email["email_sender"]
+            sender_message = unanswerd_email["message"]
+            sender_username = unanswerd_email["sender"]
+            response = generate_email_response(sender_username, sender_message)
+            if response:
+                status = send_email(send_to, response, token)
+                print(f"Response for email { email_id } replied with status code {status}")
+                if status == 200:
+                    set_email_as_answered(email_id)
+            else:
+                print(f"Failed to generate response for email { email_id }. Skipping.")
+        
+             
