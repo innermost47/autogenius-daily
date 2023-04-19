@@ -39,6 +39,8 @@ class EmailController
                         if ($authenticated_user["role"] == "ADMIN") {
                             if ($id) {
                                 $data = $this->model->setAsAnswered($id);
+                                header('HTTP/1.0 200 OK');
+                                echo json_encode(['message' => 'Email sent']);
                             } elseif ($email) {
                                 $email = $this->model->getOne($email);
                             } else {           
