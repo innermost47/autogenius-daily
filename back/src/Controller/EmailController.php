@@ -38,9 +38,15 @@ class EmailController
                     if ($authenticated_user) {
                         if ($authenticated_user["role"] == "ADMIN") {
                             if ($id) {
-                                $data = $this->model->setAsAnswered($id);
-                                header('HTTP/1.0 200 OK');
-                                echo json_encode(['message' => 'Email sent']);
+                                $isSetAsAnswsered = $this->model->setAsAnswered($id);
+                                if($isSetAsAnswsered) {
+                                    header('HTTP/1.0 200 OK');
+                                    echo json_encode(['message' => 'Email sent']);
+                                } else {
+                                    header('HTTP/1.0 500 Internal Server Error');
+                                    echo json_encode(['message' => 'Internal Server Error']);
+                                    return;
+                                }
                             } elseif ($email) {
                                 $email = $this->model->getOne($email);
                             } else {           
