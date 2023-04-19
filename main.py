@@ -146,12 +146,12 @@ def find_image_key_word(content):
     return response.choices[0].text.strip()
 
 def generate_response(short_content, comments):
-    prompt = f"Please provide a thoughtful and relevant response to the following comment: '{short_content}'.\n\nKeep in mind that you are the writer of this article. {len(comments)} comments have been made on this article so far.\n\n"
+    prompt = f"[autoGenius]: '{short_content}'\n"
 
     for comment in comments:
         prompt += f"[{comment['username']}]: {comment['content']}\n"
 
-    prompt += "\n[You]: "
+    prompt += "[autoGenius]: "
 
     response = openai.Completion.create(
         engine="text-davinci-002",
