@@ -45,7 +45,7 @@ class CommentController
                         return;
                     }
                 }
-                echo json_encode(Utils::convertHtmlEntities($data));
+                echo json_encode($data);
                 break;
             case 'POST':
                 $token = $_POST['token'] ?? null;
