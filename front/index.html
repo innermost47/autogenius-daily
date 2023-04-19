@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="/tarteaucitronjs/tarteaucitron.js"></script>
+    <script src="tarteaucitronjs/tarteaucitron.js"></script>
 
     <script type="text/javascript">
       tarteaucitron.init({
@@ -48,7 +48,8 @@
         mandatory: true /* Show a message about mandatory cookies */,
         mandatoryCta: true /* Show the disabled accept button when mandatory on */,
       });
-      (tarteaucitron.job = tarteaucitron.job || []).push("adsense");
+      tarteaucitron.user.adsensecapub = "ca-pub-9254137704442119";
+      (tarteaucitron.job = tarteaucitron.job || []).push("adsenseauto");
     </script>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -246,7 +247,15 @@
       <section class="py-5 mb-4" id="contact">
         <div class="card p-2 shadow">
           <h2 class="mb-3">Contact</h2>
-          <p>Disclaimer: Please note that this contact form is powered by an AI language model called GPT-3. Although I will receive your message, GPT-3 will be the one responding to it. Please be assured that GPT-3 has been instructed to reply to your message with courtesy and professionalism. If you have any concerns about submitting your message through this form, please do not hesitate to contact me directly on my website. Thank you for your understanding.</p>
+          <p>
+            Disclaimer: Please note that this contact form is powered by an AI
+            language model called GPT-3. Although I will receive your message,
+            GPT-3 will be the one responding to it. Please be assured that GPT-3
+            has been instructed to reply to your message with courtesy and
+            professionalism. If you have any concerns about submitting your
+            message through this form, please do not hesitate to contact me
+            directly on my website. Thank you for your understanding.
+          </p>
           <form id="contactForm">
             <div class="mb-3">
               <label for="name" class="form-label">Name</label>
@@ -257,7 +266,7 @@
                 placeholder="Enter your name"
                 required
               />
-               <p id="nameControl" class="text-danger"></p>
+              <p id="nameControl" class="text-danger"></p>
             </div>
             <div class="mb-3">
               <label for="email" class="form-label">Email address</label>
@@ -269,7 +278,7 @@
                 required
                 email
               />
-               <p id="emailControl" class="text-danger"></p>
+              <p id="emailControl" class="text-danger"></p>
             </div>
             <div class="mb-3">
               <label for="message" class="form-label">Message</label>
@@ -280,7 +289,7 @@
                 placeholder="Enter your message"
                 required
               ></textarea>
-               <p id="messageControl" class="text-danger"></p>
+              <p id="messageControl" class="text-danger"></p>
             </div>
             <input type="hidden" id="bot-control" />
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -324,7 +333,10 @@
               aria-label="Close"
             ></button>
           </div>
-          <div class="toast-body">Email successfully sent! AutoGenius will answer you as soon as possible!</div>
+          <div class="toast-body">
+            Email successfully sent! AutoGenius will answer you as soon as
+            possible!
+          </div>
         </div>
       </div>
     </main>
