@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import html
 from pyllamacpp.model import Model
+from requests.exceptions import JSONDecodeError
 
 load_dotenv()
 
@@ -71,13 +72,24 @@ def fetch_news(category):
 
 def fetch_image_url(query):
     url = f"https://pixabay.com/api/?key={pixabay_api_key}&q={urllib.parse.quote(query)}&image_type=photo"
-    response = requests.get(url)
-    data = response.json()
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
 
-    if data["total"] > 0:
-        random_image = random.choice(data["hits"])
-        return random_image["webformatURL"]
-    return None
+        try:
+            data = response.json()
+        except JSONDecodeError:
+            print(f"Invalid JSON response from {url}")
+            return None
+
+        if data["total"] > 0:
+            random_image = random.choice(data["hits"])
+            return random_image["webformatURL"]                     
+        return None
+    
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred while making a request to {url}: {e}")
+        return None
 
 def summarize_news(articles):
     text_to_summarize = " ".join(
