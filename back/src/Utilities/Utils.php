@@ -8,9 +8,13 @@ use stdClass;
 class Utils
 {
 
-    public static function sanitizeInput($input)
-    {
-        return trim(stripslashes(htmlspecialchars($input, ENT_QUOTES, 'UTF-8')));
+    public static function sanitizeInput($input) {
+        $sanitizedInput = trim(stripslashes(htmlspecialchars($input, ENT_QUOTES, 'UTF-8')));
+        return self::convertHtmlEntitiesToCharacters($sanitizedInput);
+    }
+
+    public static function convertHtmlEntitiesToCharacters($string) {
+        return html_entity_decode($string, ENT_QUOTES, 'UTF-8');
     }
 
     public static function isSecurePassword($password)
