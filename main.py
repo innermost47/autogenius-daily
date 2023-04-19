@@ -242,7 +242,7 @@ def login(email, password):
 def fetch_comments(token):
     api_url = f"{my_domain_url}?page=comments&token={token}"
 
-    response = requests.get(api_url. headers=headers)
+    response = requests.get(api_url, headers=headers)
 
     if response.status_code == 200:
         return response.json()
@@ -253,7 +253,7 @@ def fetch_comments(token):
 def fetch_emails(token):
     api_url = f"{my_domain_url}?page=email&token={token}"
 
-    response = requests.get(api_url. headers=headers)
+    response = requests.get(api_url, headers=headers)
 
     if response.status_code == 200:
         return response.json()
@@ -263,7 +263,7 @@ def fetch_emails(token):
     
 def set_email_as_answered(email_id):
     api_url = f"{my_domain_url}?page=email&id={email_id}&token={token}"
-    response = requests.get(api_url. headers=headers)
+    response = requests.get(api_url, headers=headers)
 
     if response.status_code == 200:
         print(f"Success set email {email_id} as answered. Status code: {response.status_code}")

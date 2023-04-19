@@ -40,7 +40,7 @@ class ArticleController
                     $comments = $this->comment->getCommentsByArticleId($id);
                     $data = [
                         'article' => $article,
-                        'comments'=> $comments,
+                        'comments' => $comments,
                     ];
                 } elseif ($category) {
                     $category = $this->category->getOne($category);

@@ -1,7 +1,6 @@
 .env
 back/vendor
 back/.htaccess
-front/tarteaucitronjs
 back/.env
-front/.htaccess
+front
 dump.sql
