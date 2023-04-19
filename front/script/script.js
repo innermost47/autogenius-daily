@@ -121,17 +121,18 @@ function loadArticles(category = null) {
                   htmlTitle;
                 document.getElementById("articleModalContent").textContent =
                   textContent;
-                const decodedString = decodeURIComponent(
-                  data.article.sources.replace(/&quot;/g, '"')
-                );
-                const json = JSON.parse(decodedString.slice(1, -1));
-                for (const key in json) {
-                  const link = document.createElement("a");
-                  link.href = json[key];
-                  link.target = "_blank";
-                  link.style.display = "block";
-                  link.textContent = json[key];
-                  sources.appendChild(link);
+                const sourcesString = data.article.sources;
+                const sourcesDataIntermediate = JSON.parse(sourcesString);
+                const sourcesData = JSON.parse(sourcesDataIntermediate);
+                for (const src in sourcesData) {
+                  if (sourcesData.hasOwnProperty(src)) {
+                    const link = document.createElement("a");
+                    link.href = sourcesData[src];
+                    link.target = "_blank";
+                    link.style.display = "block";
+                    link.textContent = sourcesData[src];
+                    sources.appendChild(link);
+                  }
                 }
                 document.getElementById("articleModaldate").textContent =
                   formattedDate;
