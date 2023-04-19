@@ -21,6 +21,18 @@ registrationError.textContent = "";
 loginError.textContent = "";
 const moderation = document.getElementById("moderation");
 const sources = document.getElementById("sources");
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const name = document.getElementById("name");
+const message = document.getElementById("message");
+const email = document.getElementById("email");
+const botControl = document.getElementById("bot-control");
+const emailSuccessToast = document.getElementById("emailSuccessToast")
+const nameControl = document.getElementById("nameControl")
+const emailControl = document.getElementById("emailControl")
+const messageControl = document.getElementById("messageControl")
+nameControl.value = ""
+emailControl.value = ""
+messageControl.value = ""
 
 function formatDate(date) {
   const options = { year: "numeric", month: "long", day: "numeric" };
@@ -299,6 +311,28 @@ if (document.getElementById("categorySelect")) {
       const selectedCategory = event.target.value;
       loadArticles(selectedCategory === "all" ? null : selectedCategory);
     });
+}
+
+if(document.getElementById("contactForm")) {
+  document.getElementById("contactForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    let senderName = name.value;
+    let senderMessage = message.value;
+    let senderEmail = email.value;
+    let senderBotControl = botControl.value;
+    if (botControl.value !== '') {
+      alert('Bot control is incorrect.');
+    }
+    if (name.value.trim() === '') {
+      alert('Please enter your name.');
+    }
+    if (email.value.trim() === '' || !emailRegex.test(email.value.trim())) {
+      alert('Please enter a valid email address.');
+    }
+    if (message.value.trim() === '') {
+      alert('Please enter your message.');
+    }
+  }
 }
 
 function setDisplay() {
