@@ -80,7 +80,7 @@ class Comment
 
     public function getAllArticlesWithAllCommentsWithLastCommentIsNotBot()
     {
-        $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id ORDER BY articles.created_at DESC";
+        $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id ORDER BY articles.created_at DESC LIMIT 10";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
