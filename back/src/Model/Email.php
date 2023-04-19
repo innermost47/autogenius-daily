@@ -49,7 +49,7 @@ class Email
         return $stmt->execute();
     }
 
-    public function checkAsAnswered($id)
+    public function setAsAnswered($id)
     {
         $query = "UPDATE email SET is_replied = 1 WHERE id = :id";
         $stmt = $this->pdo->prepare($query);
