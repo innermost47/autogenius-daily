@@ -26,7 +26,7 @@ const name = document.getElementById("name");
 const message = document.getElementById("message");
 const email = document.getElementById("email");
 const botControl = document.getElementById("bot-control");
-const emailSuccessToast = document.getElementById("emailSuccessToast")
+const emailSuccessToast = new bootstrap.Toast(document.getElementById("emailSuccessToast"));
 const nameControl = document.getElementById("nameControl")
 const emailControl = document.getElementById("emailControl")
 const messageControl = document.getElementById("messageControl")
@@ -314,25 +314,63 @@ if (document.getElementById("categorySelect")) {
 }
 
 if(document.getElementById("contactForm")) {
-  document.getElementById("contactForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    let senderName = name.value;
-    let senderMessage = message.value;
-    let senderEmail = email.value;
-    let senderBotControl = botControl.value;
-    if (botControl.value !== '') {
-      alert('Bot control is incorrect.');
-    }
-    if (name.value.trim() === '') {
-      alert('Please enter your name.');
-    }
-    if (email.value.trim() === '' || !emailRegex.test(email.value.trim())) {
-      alert('Please enter a valid email address.');
-    }
-    if (message.value.trim() === '') {
-      alert('Please enter your message.');
-    }
+  document.getElementById("contactForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  let senderName = name.value;
+  let senderMessage = message.value;
+  let senderEmail = email.value;
+  let senderBotControl = botControl.value;
+
+  if (senderBotControl !== '') {
+    alert('Go away spammer !');
+    return;
   }
+  if (senderName.trim() === '') {
+    nameControl.textContent = 'Please enter your name.';
+    return;
+  }
+  if (senderEmail.trim() === '' || !emailRegex.test(senderEmail.trim())) {
+    emailControl.textContent = 'Please enter a valid email address.';
+    return;
+  }
+  if (senderMessage.trim() === '') {
+    messageControl.textContent = 'Please enter your message.';
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("name", senderName);
+  formData.append("email", senderEmail);
+  formData.append("message", senderMessage);
+  formData.append("bot-control",botControl);
+
+  const token = localStorage.getItem("token");
+  if (token) {
+    formData.append("token", token);
+  } else {
+    formData.append("token", null);
+  }
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      body: formData
+    });
+
+    if (response.status === 200) {
+      const toast = new bootstrap.Toast(document.getElementById("successToast"));
+      toast.show();
+      name.value = '';
+      email.value = '';
+      message.value = '';
+    } else {
+      emailMessageToast.show();
+    }
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
+});
+
 }
 
 function setDisplay() {
