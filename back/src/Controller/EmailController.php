@@ -32,14 +32,34 @@ class EmailController
             case 'GET':
                 $id = $_GET['id'] ?? null;
                 $email = $_GET['email'] ?? null;
-                if ($id) {
-                    $data = $this->model->getOne($id);
-                } elseif ($email) {
-                    $email = $this->model->getOne($email);
+                $token = $_GET['token'] ?? null;
+                if($token) {
+                    $authenticated_user = $this->authentication->authenticateUserByToken($token);
+                    if ($authenticated_user) {
+                        if ($authenticated_user["role"] == "ADMIN") {
+                            if ($id) {
+                                $data = $this->model->getOne($id);
+                            } elseif ($email) {
+                                $email = $this->model->getOne($email);
+                            } else {           
+                                $data = $this->model->getAllNotReplied();
+                            }
+                            echo json_encode($data);
+                        } else {
+                            header('HTTP/1.0 401 Unauthorized');
+                            echo json_encode(['message' => 'Unauthorized']);
+                            return;
+                        }
+                    } else {
+                      header('HTTP/1.0 401 Unauthorized');
+                      echo json_encode(['message' => 'Unauthorized']);
+                      return;
+                    }
                 } else {
-                    $data = $this->model->getAllNotReplied();
+                      header('HTTP/1.0 401 Unauthorized');
+                      echo json_encode(['message' => 'Unauthorized']);
+                      return;
                 }
-                echo json_encode($data);
                 break;
             case 'POST':
                 $email = Utils::sanitizeInput($_POST['email']) ?? null;
