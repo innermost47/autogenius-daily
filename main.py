@@ -19,6 +19,13 @@ pixabay_api_key = os.environ.get("PIXABAY_API_KEY")
 my_domain_url = os.environ.get("MY_DOMAIN_URL")
 email = os.environ.get("EMAIL")
 password = os.environ.get("PASSWORD")
+referer = os.environ.get("REFERER")
+
+headers = {
+    'Content-Type': 'application/json',
+    'Referer': referer,
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
+}
 
 class Sanitizer:
     @staticmethod
@@ -182,7 +189,7 @@ def send_to_api(category, title, content, image_url, short_content, sources, tok
         "token": token,
         "page": "articles",
     }
-    response = requests.post(api_url, data=data)
+    response = requests.post(api_url, data=data, headers=headers)
     return response.status_code
 
 def send_response(content, article_id, token):
@@ -194,7 +201,7 @@ def send_response(content, article_id, token):
         "page": "comments",
     }
 
-    response = requests.post(api_url, data=data)
+    response = requests.post(api_url, data=data, headers=headers)
     return response.status_code
 
 
@@ -206,7 +213,7 @@ def login(email, password):
         "action": "login",
         "page": "users",
     }
-    response = requests.post(api_url, data=data)
+    response = requests.post(api_url, data=data, headers=headers)
 
     if response.status_code == 200:
         return response.json()["token"]
@@ -216,7 +223,7 @@ def login(email, password):
 def fetch_comments(token):
     api_url = f"{my_domain_url}?page=comments&token={token}"
 
-    response = requests.get(api_url)
+    response = requests.get(api_url. headers=headers)
 
     if response.status_code == 200:
         return response.json()
@@ -224,61 +231,74 @@ def fetch_comments(token):
         print(f"Error fetching unanswered comments. Status code: {response.status_code}")
         return []
     
-def create_post(token) :
-    random_category = random.choice(categories)
-    news_articles = fetch_news(random_category)
-    sources = [article["url"] for article in news_articles[:3]]
-    news_dict = {}
-    for i, url in enumerate(sources):
-        news_dict[f"news{i+1}"] = url
-    sources_json = json.dumps(news_dict)
-    if news_articles :
-        while True:
-            content = summarize_news(news_articles)
-            if not content:
-                print("Failed to summarize news. Trying again later...")
-                continue
-
-            title = find_title(content)
-            if not title:
-                print("Failed to find title. Trying again later...")
-                continue
-
-            short_content = summarize_article(content)
-            if not short_content:
-                print("Failed to summarize article. Trying again later...")
-                continue
-
-            image_key_word = find_image_key_word(title)
-            if not image_key_word:
-                print("Failed to find image key word.")
-                continue
-
+def create_post(token):
+    for post_attempts in range(3):
+        random_category = random.choice(categories)
+        news_articles = fetch_news(random_category)
+        sources = [article["url"] for article in news_articles[:3]]
+        news_dict = {}
+        for i, url in enumerate(sources):
+            news_dict[f"news{i+1}"] = url
+        sources_json = json.dumps(news_dict)
+        
+        if news_articles:
             while True:
-                image_url = fetch_image_url(image_key_word)
-                if not image_url:
+                content = summarize_news(news_articles)
+                if not content:
+                    print("Failed to summarize news. Trying again later...")
+                    continue
+
+                title = find_title(content)
+                if not title:
+                    print("Failed to find title. Trying again later...")
+                    continue
+
+                short_content = summarize_article(content)
+                if not short_content:
+                    print("Failed to summarize article. Trying again later...")
+                    continue
+
+                image_key_word = find_image_key_word(title)
+                if not image_key_word:
+                    print("Failed to find image key word.")
+                    continue
+
+                for image_attempts in range(3):
+                    image_url = fetch_image_url(image_key_word)
+                    if image_url:
+                        break
                     print("Failed to fetch image url. Trying again later...")
                     image_key_word = find_image_key_word(title)
-                    image_url = fetch_image_url(image_key_word)
-                    continue
-                break
-            break
 
-        print("All variables are valid.")
-        status = send_to_api(random_category, title, content, image_url, short_content, sources_json, token)
-        print(f"Article submitted with status code {status}")
-        return True;  
-    else:
-        print("Failed to fetch news. Try again later.")
+                if not image_url:
+                    break
+
+                print("All variables are valid.")
+                status = send_to_api(random_category, title, content, image_url, short_content, sources_json, token)
+                print(f"Article submitted with status code {status}")
+                return True
+
+            if not image_url:
+                print("Failed to fetch image after 3 attempts. Trying a new post...")
+        else:
+            print("Failed to fetch news. Try again later.")
+    
+    print("Failed to create a post after 3 attempts.")
+    return False
+
     
 
 if __name__ == "__main__":
     token = login(email, password)
     post_created = False
+
     while not post_created:
         post_created = create_post(token)
 
         if post_created:
+            print("Post successfully created.")
+        else:
+            print("Failed to create a post after 3 attempts. Exiting...")
             break
 
     unanswered_comments = fetch_comments(token)
