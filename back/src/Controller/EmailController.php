@@ -38,7 +38,7 @@ class EmailController
                     if ($authenticated_user) {
                         if ($authenticated_user["role"] == "ADMIN") {
                             if ($id) {
-                                $data = $this->model->getOne($id);
+                                $data = $this->model->setAsAnswered($id);
                             } elseif ($email) {
                                 $email = $this->model->getOne($email);
                             } else {           
