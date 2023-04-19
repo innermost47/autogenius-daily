@@ -1,21 +1,22 @@
 import requests
-import openai
 import random
 import urllib.parse
 import json
 import os
 from dotenv import load_dotenv
 import html
+from pyllamacpp.model import Model
 
 load_dotenv()
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
 news_api_key = os.environ.get("NEWS_API_KEY")
 pixabay_api_key = os.environ.get("PIXABAY_API_KEY")
 my_domain_url = os.environ.get("MY_DOMAIN_URL")
 email = os.environ.get("EMAIL")
 password = os.environ.get("PASSWORD")
 referer = os.environ.get("REFERER")
+your_model = os.environ.get("YOUR_MODEL")
+pyllama_model = Model(ggml_model=your_model, n_ctx=2000)
 
 headers = {
     'Referer': referer,
@@ -90,70 +91,26 @@ def summarize_news(articles):
     prompt = (
         f"Please provide a large summary of the following news: {text_to_summarize}"
     )
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=1800,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
 
-    return response.choices[0].text.strip()
+    return pyllama_model.generate(prompt, n_predict=1800)
 
 def summarize_article(article):
     prompt = (
         f"Please provide a short summary of the following news: {article}"
     )
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=255,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
-
-    return response.choices[0].text.strip()
+    return pyllama_model.generate(prompt, n_predict=255)
 
 def find_title(content):
     prompt = f"Please provide a concise title for the following article: {content}"
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=20,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
-
-    return response.choices[0].text.strip()
+    return pyllama_model.generate(prompt, n_predict=20)
 
 def find_image_key_word(content):
     prompt = f"Provide me with just one keyword related to the following article: {content}"
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=20,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
-
-    return response.choices[0].text.strip()
+    return pyllama_model.generate(prompt, n_predict=20)
 
 def generate_email_response(username, message):
     prompt = f"You are autoGenius, a news blog writer, {username} sent you this email: {message} via your blog, answer him on a professional way"
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=400,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
-
-    return response.choices[0].text.strip()
+    return pyllama_model.generate(prompt, n_predict=400)
 
 def generate_response(short_content, comments):
     prompt = f"[autoGenius]: '{short_content}'\n"
@@ -163,16 +120,7 @@ def generate_response(short_content, comments):
 
     prompt += "[autoGenius]: "
 
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=800,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
-
-    return response.choices[0].text.strip()
+    return pyllama_model.generate(prompt, n_predict=800)
 
 def send_to_api(category, title, content, image_url, short_content, sources, token):
     api_url = f"{my_domain_url}"

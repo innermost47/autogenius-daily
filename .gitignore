@@ -3,4 +3,3 @@ back/vendor
 back/.htaccess
 back/.env
 front
-dump.sql
