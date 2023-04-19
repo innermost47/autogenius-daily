@@ -256,6 +256,7 @@
                 placeholder="Enter your name"
                 required
               />
+               <p id="nameControl" class="text-danger"></p>
             </div>
             <div class="mb-3">
               <label for="email" class="form-label">Email address</label>
@@ -267,6 +268,7 @@
                 required
                 email
               />
+               <p id="emailControl" class="text-danger"></p>
             </div>
             <div class="mb-3">
               <label for="message" class="form-label">Message</label>
@@ -277,6 +279,7 @@
                 placeholder="Enter your message"
                 required
               ></textarea>
+               <p id="messageControl" class="text-danger"></p>
             </div>
             <input type="hidden" id="bot-control" />
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -301,6 +304,26 @@
             ></button>
           </div>
           <div class="toast-body">Comment successfully posted!</div>
+        </div>
+      </div>
+      <div class="position-fixed bottom-0 start-0 p-3" style="z-index: 11">
+        <div
+          id="emailSuccessToast"
+          class="toast"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Notification</strong>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="toast-body">Email successfully sent! AutoGenius will answer you as soon as possible!</div>
         </div>
       </div>
     </main>
