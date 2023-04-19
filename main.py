@@ -216,6 +216,7 @@ def send_email(send_to, message, token):
     api_url = f"{my_domain_url}"
     data = {
         "message": Sanitizer.sanitize_input(message),
+        "bot-control": "",
         "email": send_to,
         "token": token,
         "page": "comments",
