@@ -74,7 +74,15 @@ class EmailController
                 $sender = Utils::sanitizeInput($_POST['sender']) ?? null;
                 $message = Utils::sanitizeInput($_POST['message']) ?? null;
                 $token = $_POST["token"] ?? null;
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+$botControl = $_POST["bot-control"] ?? null;
+if(!empty($botControl)) {
+header('HTTP/1.0 400 Bad Request');
+                    echo json_encode(['message' => 'Bad Request']);
+                    return;
+}            
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     header('HTTP/1.0 400 Bad Request');
                     echo json_encode(['message' => 'Bad Request']);
                     return;
@@ -89,10 +97,13 @@ class EmailController
                     if ($authenticated_user) {
                         if ($authenticated_user["role"] == "USER") {
                             $this->model->post($sender, $email, $message);
+Utils::sendEmail($this->autoDailyEmail, "A message from AutoGenius Daily", $message, $email, "AutoGenius Daily");
                             header('HTTP/1.0 200 OK');
+
                             echo json_encode(['message' => 'Email sent']);
                         } else {
                             Utils::sendEmail($email, "A message from AutoGenius Daily", $message, $this->autoDailyEmail, "AutoGenius Daily");
+Utils::sendEmail($this->autoDailyEmail, "A message from AutoGenius Daily", $message, $email, "AutoGenius Daily");
                             header('HTTP/1.0 200 OK');
                             echo json_encode(['message' => 'Email sent']);
                         }
