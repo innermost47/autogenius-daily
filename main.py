@@ -5,8 +5,8 @@ import json
 import os
 from dotenv import load_dotenv
 import html
-from pyllamacpp.model import Model
 from requests.exceptions import JSONDecodeError
+from llama_cpp import Llama
 
 load_dotenv()
 
@@ -17,7 +17,6 @@ email = os.environ.get("EMAIL")
 password = os.environ.get("PASSWORD")
 referer = os.environ.get("REFERER")
 your_model = os.environ.get("YOUR_MODEL")
-pyllama_model = Model(ggml_model=your_model, n_ctx=2000)
 
 headers = {
     'Referer': referer,
@@ -34,6 +33,21 @@ class Sanitizer:
     def convert_html_entities_to_characters(string):
         return html.unescape(string)
 
+model_path = your_model
+
+llm = Llama(model_path=model_path, n_threads=2)
+
+ins = '''### Instruction:
+{}
+### Response:
+'''
+
+def generate(instruction): 
+    result = ""
+    for x in llm(ins.format(instruction), stop=['### Instruction:', '### End'], stream=True):
+        result += x['choices'][0]['text']
+    return result
+   
 categories = [
     "business",
     "entertainment",
@@ -43,7 +57,6 @@ categories = [
     "sports",
     "technology",
 ]
-
 
 def fetch_news(category):
     url = f"https://newsapi.org/v2/top-headlines?country=us&category={category}&apiKey={news_api_key}"
@@ -104,25 +117,25 @@ def summarize_news(articles):
         f"Please provide a large summary of the following news: {text_to_summarize}"
     )
 
-    return pyllama_model.generate(prompt, n_predict=1800)
+    return generate(prompt)
 
 def summarize_article(article):
     prompt = (
-        f"Please provide a short summary of the following news: {article}"
+        f"Provide a short summary of the following news: {article}"
     )
-    return pyllama_model.generate(prompt, n_predict=255)
+    return generate(prompt)
 
 def find_title(content):
-    prompt = f"Please provide a concise title for the following article: {content}"
-    return pyllama_model.generate(prompt, n_predict=20)
+    prompt = f"Provide a concise title for the following article: {content}"
+    return generate(prompt)
 
 def find_image_key_word(content):
-    prompt = f"Provide me with just one keyword related to the following article: {content}"
-    return pyllama_model.generate(prompt, n_predict=20)
+    prompt = f"Generate a single word that describe the most the following content : {content}"
+    return generate(prompt)
 
 def generate_email_response(username, message):
     prompt = f"You are autoGenius, a news blog writer, {username} sent you this email: {message} via your blog, answer him on a professional way"
-    return pyllama_model.generate(prompt, n_predict=400)
+    return generate(prompt)
 
 def generate_response(short_content, comments):
     prompt = f"[autoGenius]: '{short_content}'\n"
@@ -132,7 +145,7 @@ def generate_response(short_content, comments):
 
     prompt += "[autoGenius]: "
 
-    return pyllama_model.generate(prompt, n_predict=800)
+    return generate(prompt)
 
 def send_to_api(category, title, content, image_url, short_content, sources, token):
     api_url = f"{my_domain_url}"
