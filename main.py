@@ -34,7 +34,6 @@ class Sanitizer:
         return html.unescape(string)
 
 model_path = your_model
-
 llm = Llama(model_path=model_path, n_threads=2)
 
 ins = '''### Instruction:
@@ -46,7 +45,10 @@ def generate(instruction):
     result = ""
     for x in llm(ins.format(instruction), stop=['### Instruction:', '### End'], stream=True):
         result += x['choices'][0]['text']
-    return result
+    res = ""
+    for response in result:
+        res += response
+    return res
    
 categories = [
     "business",
