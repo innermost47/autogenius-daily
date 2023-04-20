@@ -101,4 +101,14 @@ class Comment
 
         return $articles;
     }
+
+    public function isCommentOwner($commentId, $ownerId)
+    {
+        $query = "SELECT * FROM comments WHERE id = :id AND user_id = :user_id";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':id', $commentId);
+        $stmt->bindParam(':user_id', $ownerId);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

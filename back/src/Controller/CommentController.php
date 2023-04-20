@@ -100,25 +100,58 @@ class CommentController
                     $authenticated_user = $this->authentication->authenticateUserByToken($token);
                     if ($authenticated_user) {
                         $authenticated_user_id = $authenticated_user['id'];
+                        $isCommentOwner = $this->model->isCommentOwner($id, $authenticated_user_id);
+                        if (!$isCommentOwner) {
+                            header('HTTP/1.0 403 Forbidden');
+                            echo json_encode(['message' => 'Forbidden']);
+                            return;
+                        }
                         if (!$content) {
                             header('HTTP/1.0 400 Bad Request');
                             echo json_encode(['message' => 'Bad Request']);
                             return;
                         }
                         if ($authenticated_user["role"] == "USER") {
-                            $result = $this->model->update($id, $content);
-                        }
-                        if ($result) {
-                            echo json_encode(['message' => 'Updated']);
+                            $toxicity_threshold = 0.75;
+                            $score = Utils::getPerspectiveScore($content);
+                            if ($score < $toxicity_threshold) {
+                                $result = $this->model->update($id, $content);
+                                if ($result) {
+                                    header('HTTP/1.0 200 OK');
+                                    $result = [
+                                        "message" => "updated"
+                                    ];
+                                } else {
+                                    header('HTTP/1.0 500 Internal Server Error');
+                                    $result = [
+                                        "message" => "Internal Server Error"
+                                    ];
+                                    echo json_encode($result);
+                                    return;
+                                }
+                            } else {
+                                header('HTTP/1.0 400 Bad Request');
+                                $result = [
+                                    "status" => "error",
+                                    "message" => "moderation"
+                                ];
+                                echo json_encode($result);
+                                return;
+                            }
                         } else {
-                            header('HTTP/1.0 500 Internal Server Error');
-                            echo json_encode(['message' => 'Internal Server Error']);
+                            header('HTTP/1.0 403 Forbidden');
+                            echo json_encode(['message' => 'Forbidden']);
+                            return;
                         }
                     } else {
                         header('HTTP/1.0 403 Forbidden');
                         echo json_encode(['message' => 'Forbidden']);
                         return;
                     }
+                } else {
+                    header('HTTP/1.0 401 Unauthorized');
+                    echo json_encode(['message' => 'Unauthorized']);
+                    return;
                 }
                 break;
             case 'DELETE':
@@ -131,6 +164,19 @@ class CommentController
                 }
                 if ($token) {
                     $authenticated_user = $this->authentication->authenticateUserByToken($token);
+                    if ($authenticated_user) {
+                        $authenticated_user_id = $authenticated_user['id'];
+                        $isCommentOwner = $this->model->isCommentOwner($id, $authenticated_user_id);
+                        if (!$isCommentOwner) {
+                            header('HTTP/1.0 403 Forbidden');
+                            echo json_encode(['message' => 'Forbidden']);
+                            return;
+                        }
+                    } else {
+                        header('HTTP/1.0 403 Forbidden');
+                        echo json_encode(['message' => 'Forbidden']);
+                        return;
+                    }
                     $comment = $this->model->getOne($id);
                     $result = $this->model->delete($id);
                     if ($result) {
