@@ -8,6 +8,7 @@ import html
 from requests.exceptions import JSONDecodeError
 from llama_cpp import Llama
 import unicodedata
+from newspaper import Article
 
 load_dotenv()
 
@@ -54,13 +55,13 @@ ins = """### Instruction:
 """
 
 
-def generate(instruction):
+def generate(instruction, max_tokens):
     result = ""
     for x in llm(
         ins.format(instruction),
         stop=["### Instruction:", "### End"],
         stream=True,
-        max_tokens=1200,
+        max_tokens=max_tokens,
     ):
         result += x["choices"][0]["text"]
     return result
@@ -95,9 +96,17 @@ def fetch_news(category):
             }
             articles_with_sources.append(article_with_source)
 
-        return articles_with_sources
+        return random.choice(articles_with_sources) if articles_with_sources else None
 
     return []
+
+
+def extract_article_content(url):
+    article = Article(url)
+    article.download()
+    article.parse()
+    print(article.text)
+    return article.text
 
 
 def fetch_image_url(query):
@@ -120,44 +129,54 @@ def fetch_image_url(query):
         return None
 
 
-def summarize_news(articles):
-    text_to_summarize = " ".join(
-        [
-            article["title"]
-            + (". " + article["description"] if article["description"] else "")
-            for article in articles
-        ]
-    )
+def summarize_news(article):
+    if not article:
+        return None
 
-    prompt = f"Summurize these news in one text: {text_to_summarize}"
-
-    response = generate(clean_text(prompt))
-    print(response)
+    max_tokens = 1024
+    prefix = "Please provide a large summary of the following news article, while ensuring the facts are accurately represented:"
+    prompt = prefix + " " + article
+    response = generate(clean_text(prompt), max_tokens)
+    if response.startswith(prefix):
+        response = response[len(prefix) :].strip(' "')
+    print(response + "\n")
     return response
 
 
 def summarize_article(article):
-    prompt = f"Summurize: {article}"
-    response = generate(clean_text(prompt))
-    print(response)
+    max_tokens = 255
+    prefix = "Please provide a concise summary of the following news article, while ensuring the facts are accurately represented:"
+    prompt = prefix + " " + article
+    response = generate(clean_text(prompt), max_tokens)
+    if response.startswith(prefix):
+        response = response[len(prefix) :].strip(' "')
+    print(response + "\n")
     return response
 
 
 def find_title(content):
-    prompt = f"Give a very concise title wich describe this: {content}"
-    response = generate(clean_text(prompt))
-    print(response)
+    max_tokens = 48
+    prefix = "Generate a concise title for the following news article:"
+    prompt = prefix + " " + content
+    response = generate(clean_text(prompt), max_tokens)
+    if response.startswith(prefix):
+        response = response[len(prefix) :].strip(' "')
+    print(response + "\n")
     return response
 
 
 def generate_email_response(username, message):
+    max_tokens = 1024
     prompt = f"You are autoGenius, a news blog writer, {username} sent you this email: {message} via your blog, answer him on a professional way"
-    response = generate(clean_text(prompt))
-    print(response)
+    response = generate(clean_text(prompt), max_tokens)
+    if response.startswith(prompt):
+        response = response[len(prompt) :].strip(' "')
+    print(response + "\n")
     return response
 
 
 def generate_response(short_content, comments):
+    max_tokens = 64
     prompt = f"[autoGenius]: '{short_content}'\n"
 
     for comment in comments:
@@ -165,15 +184,21 @@ def generate_response(short_content, comments):
 
     prompt += "[autoGenius]: "
 
-    response = generate(clean_text(prompt))
-    print(response)
+    response = generate(clean_text(prompt), max_tokens)
+    if response.startswith(prompt):
+        response = response[len(prompt) :].strip(' "')
+    print(response + "\n")
     return response
 
 
 def extract_keywords(content):
-    prompt = f"Summerize in only one word: {content}"
-    response = generate(clean_text(prompt))
-    print(response)
+    max_tokens = 16
+    prefix = "Summerize in only one word:"
+    prompt = prefix + " " + content
+    response = generate(clean_text(prompt), max_tokens)
+    if response.startswith(prefix):
+        response = response[len(prefix) :].strip(' "')
+    print(response + "\n")
     return response
 
 
@@ -284,40 +309,46 @@ def set_email_as_answered(email_id):
 def create_post(token):
     for post_attempts in range(3):
         random_category = random.choice(categories)
-        news_articles = fetch_news(random_category)
-        sources = [article["url"] for article in news_articles[:3]]
+        news_article = fetch_news(random_category)
+        sources = [news_article["url"]] if news_article else []
+        article = extract_article_content(news_article["url"])
         news_dict = {}
         for i, url in enumerate(sources):
             news_dict[f"news{i+1}"] = url
         sources_json = json.dumps(news_dict)
 
-        if news_articles:
-            while True:
-                content = summarize_news(news_articles)
+        if news_article:
+            success = False
+            while not success:
+                content = summarize_news(article)
                 if not content:
                     print("Failed to summarize news. Trying again later...")
-                    continue
-
-                title = find_title(content)
-                if not title:
-                    print("Failed to find title. Trying again later...")
-                    continue
+                    break
 
                 short_content = summarize_article(content)
                 if not short_content:
                     print("Failed to summarize article. Trying again later...")
-                    continue
+                    break
+
+                while True:
+                    title = find_title(short_content)
+                    if not title:
+                        print("Failed to find title. Trying again later...")
+                    elif len(title) > 255:
+                        print("Title too long. Regenerating title...")
+                    else:
+                        break
 
                 keywords = extract_keywords(content)
                 if not keywords:
                     print("Failed to find keywords. Trying again later...")
-                    continue
+                    break
 
                 image_url = fetch_image_url(keywords)
+                if not image_url:
+                    print("Failed to find image. Trying again later...")
+                    break
 
-                print(
-                    title, image_url, short_content, sources_json, content, sep="\n\n"
-                )
                 status = send_to_api(
                     random_category,
                     title,
@@ -328,6 +359,7 @@ def create_post(token):
                     token,
                 )
                 print(f"Article submitted with status code {status}")
+                success = True
                 return True
 
         else:
@@ -358,7 +390,12 @@ if __name__ == "__main__":
             short_content = article["short_content"]
             comments = article["comments"]
             if comments != None:
-                response = generate_response(short_content, comments)
+                while True:
+                    response = generate_response(short_content, comments)
+                    if len(response) > 255:
+                        print("Comment too long. Regenerating title...")
+                    else:
+                        break
                 if response:
                     status = send_response(response, article_id, token)
                     print(
