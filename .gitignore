@@ -3,3 +3,5 @@ back/vendor
 back/.htaccess
 back/.env
 front
+custom_bot.py
+.vscode
