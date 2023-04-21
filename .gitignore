@@ -6,3 +6,7 @@ front
 custom_bot.py
 .vscode
 test.py
+tokenizer.pickle
+encoder_model.h5
+decoder_model.h5
+training_model.h5
