@@ -188,11 +188,12 @@ def generate_response(short_content, comments):
     for comment in comments:
         prompt += f"[{comment['username']}]: {comment['content']}\n"
 
-    prompt += "[autoGenius]: "
+    name = "[autoGenius]:"
+    prompt += name + " "
 
     response = generate(clean_text(prompt), max_tokens)
-    if response.startswith(prompt):
-        response = response[len(prompt) :].strip(' "')
+    if response.startswith(name):
+        response = response[len(name) :].strip(' "')
     print(response + "\n")
     return response
 
@@ -247,10 +248,10 @@ def send_email(send_to, message, token):
     api_url = f"{my_domain_url}"
     data = {
         "message": Sanitizer.sanitize_input(message),
-        "bot-control": "",
+        "botcontrol": "",
         "email": send_to,
         "token": token,
-        "page": "comments",
+        "page": "email",
     }
 
     response = requests.post(api_url, data=data, headers=headers)
