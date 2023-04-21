@@ -80,13 +80,17 @@ class EmailController
                     echo json_encode(['message' => 'Bad Request']);
                     return;
                 }
-
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     header('HTTP/1.0 400 Bad Request');
                     echo json_encode(['message' => 'Bad Request']);
                     return;
                 }
                 if (empty(trim($message))) {
+                    header('HTTP/1.0 400 Bad Request');
+                    echo json_encode(['message' => 'Bad Request']);
+                    return;
+                }
+                if (empty(trim($sender))) {
                     header('HTTP/1.0 400 Bad Request');
                     echo json_encode(['message' => 'Bad Request']);
                     return;
@@ -101,8 +105,8 @@ class EmailController
 
                             echo json_encode(['message' => 'Email sent']);
                         } else {
-                            Utils::sendEmail($email, "A message from AutoGenius Daily", $message, $this->autoDailyEmail, "AutoGenius Daily");
-                            Utils::sendEmail($this->autoDailyEmail, "A message from AutoGenius Daily", $message, $email, "AutoGenius Daily");
+                            Utils::sendEmail($email, "A message from AutoGenius Daily", $message, $this->autoDailyEmail, $sender);
+                            Utils::sendEmail($this->autoDailyEmail, "A message from AutoGenius Daily", $message, $email, $sender);
                             header('HTTP/1.0 200 OK');
                             echo json_encode(['message' => 'Email sent']);
                         }

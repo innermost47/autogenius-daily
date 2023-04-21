@@ -251,6 +251,7 @@ def send_email(send_to, message, token):
         "botcontrol": "",
         "email": send_to,
         "token": token,
+        "sender": "AutoGenius Daily",
         "page": "email",
     }
 
