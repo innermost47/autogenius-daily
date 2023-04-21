@@ -74,8 +74,7 @@ class EmailController
                 $sender = Utils::sanitizeInput($_POST['sender']) ?? null;
                 $message = Utils::sanitizeInput($_POST['message']) ?? null;
                 $token = $_POST["token"] ?? null;
-
-                $botControl = $_POST["bot-control"] ?? null;
+                $botControl = $_POST["botcontrol"] ?? null;
                 if (!empty($botControl)) {
                     header('HTTP/1.0 400 Bad Request');
                     echo json_encode(['message' => 'Bad Request']);
@@ -92,7 +91,7 @@ class EmailController
                     echo json_encode(['message' => 'Bad Request']);
                     return;
                 }
-                if ($token) {
+                if (!empty($token)) {
                     $authenticated_user = $this->authentication->authenticateUserByToken($token);
                     if ($authenticated_user) {
                         if ($authenticated_user["role"] == "USER") {

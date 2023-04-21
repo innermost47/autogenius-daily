@@ -15,6 +15,9 @@ switch ($method) {
         $id = $_POST['id'] ?? null;
         break;
     case 'PUT':
+        $page = $_POST['page'] ?? null;
+        $id = $_POST['id'] ?? null;
+        break;
     case 'DELETE':
         $page = $input_data['page'] ?? null;
         $id = $input_data['id'] ?? null;

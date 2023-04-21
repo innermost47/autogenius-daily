@@ -17,12 +17,18 @@ pexels_api_key = os.environ.get("PEXELS_API_KEY")
 my_domain_url = os.environ.get("MY_DOMAIN_URL")
 email = os.environ.get("EMAIL")
 password = os.environ.get("PASSWORD")
-referer = os.environ.get("REFERER")
 your_model = os.environ.get("YOUR_MODEL")
 
+user_agents = [
+    "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0",
+    "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0",
+]
+random_user_agent = random.choice(user_agents)
+
 headers = {
-    "Referer": referer,
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0",
+    "Referer": "http://www.google.com",
+    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
 }
 
 
@@ -260,9 +266,11 @@ def login(email, password):
         "page": "users",
     }
     response = requests.post(api_url, data=data, headers=headers)
-
     if response.status_code == 200:
         return response.json()["token"]
+    elif response.status_code == 404:
+        print(response.status_code)
+        exit()
     return None
 
 
@@ -325,7 +333,7 @@ def create_post(token):
                     print("Failed to summarize news. Trying again later...")
                     break
 
-                short_content = summarize_article(content)
+                short_content = summarize_article(article)
                 if not short_content:
                     print("Failed to summarize article. Trying again later...")
                     break

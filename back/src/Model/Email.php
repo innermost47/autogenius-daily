@@ -24,7 +24,7 @@ class Email
 
     public function getOne($id)
     {
-        $query = "SELECT * FROM email WHERE id = :id";
+        $query = "SELECT * FROM emails WHERE id = :id";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
@@ -33,7 +33,7 @@ class Email
 
     public function post($sender, $emailSender, $message)
     {
-        $query = "INSERT INTO email (sender, email_sender, message) VALUES (:sender, :email_sender, :message)";
+        $query = "INSERT INTO emails (sender, email_sender, message) VALUES (:sender, :email_sender, :message)";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':sender', $sender);
         $stmt->bindParam(':email_sender', $emailSender);
@@ -43,7 +43,7 @@ class Email
 
     public function delete($id)
     {
-        $query = "DELETE FROM email WHERE id = :id";
+        $query = "DELETE FROM emails WHERE id = :id";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
@@ -51,7 +51,7 @@ class Email
 
     public function setAsAnswered($id)
     {
-        $query = "UPDATE email SET is_replied = 1 WHERE id = :id";
+        $query = "UPDATE emails SET is_replied = 1 WHERE id = :id";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
