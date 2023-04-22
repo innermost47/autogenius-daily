@@ -124,7 +124,7 @@ def fetch_image_url(query):
 
         try:
             json_data = response.json()
-            image_url = json_data["photos"][0]["src"]["original"]
+            image_url = json_data["photos"][0]["src"]["medium"]
         except JSONDecodeError:
             print(f"Invalid JSON response from {url}")
             return None
@@ -183,12 +183,12 @@ def generate_email_response(username, message):
 
 def generate_response(short_content, comments):
     max_tokens = 64
-    prompt = f"[autoGenius]: '{short_content}'\n"
+    prompt = f"@autoGenius: '{short_content}'\n"
 
     for comment in comments:
-        prompt += f"[{comment['username']}]: {comment['content']}\n"
+        prompt += f"@{comment['username']}: {comment['content']}\n"
 
-    name = "[autoGenius]:"
+    name = "@autoGenius:"
     prompt += name + " "
 
     response = generate(clean_text(prompt), max_tokens)
