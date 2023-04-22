@@ -124,7 +124,7 @@ def fetch_image_url(query):
 
         try:
             json_data = response.json()
-            image_url = json_data["photos"][0]["src"]["medium"]
+            image_url = json_data["photos"][0]["src"]["large"]
         except JSONDecodeError:
             print(f"Invalid JSON response from {url}")
             return None
