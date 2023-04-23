@@ -8,12 +8,14 @@ use stdClass;
 class Utils
 {
 
-    public static function sanitizeInput($input) {
+    public static function sanitizeInput($input)
+    {
         $sanitizedInput = trim(stripslashes(htmlspecialchars($input, ENT_QUOTES, 'UTF-8')));
         return self::convertHtmlEntitiesToCharacters($sanitizedInput);
     }
 
-    public static function convertHtmlEntitiesToCharacters($string) {
+    public static function convertHtmlEntitiesToCharacters($string)
+    {
         return html_entity_decode($string, ENT_QUOTES, 'UTF-8');
     }
 
@@ -83,5 +85,17 @@ class Utils
         }
 
         return $data;
+    }
+
+    public static function slugify($text)
+    {
+        $text = preg_replace('/\s+/', '-', $text);
+        $text = strtolower($text);
+        $text = str_replace(['"', "'"], '', $text);
+        $text = preg_replace('/[^\w\-]+/', '', $text);
+        $text = preg_replace('/\-\-+/', '-', $text);
+        $text = trim($text, '-');
+
+        return $text;
     }
 }

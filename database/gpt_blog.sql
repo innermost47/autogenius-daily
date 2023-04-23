@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS articles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     short_content TEXT NOT NULL,
     image_url VARCHAR(1024) DEFAULT NULL,

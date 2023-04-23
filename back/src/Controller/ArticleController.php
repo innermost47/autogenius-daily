@@ -35,18 +35,52 @@ class ArticleController
             case 'GET':
                 $id = $_GET['id'] ?? null;
                 $category = $_GET['category'] ?? null;
-                if ($id) {
+                $action = $_GET['action'] ?? null;
+                $slug = $_GET['slug'] ?? null;
+                if ($action == "total" && !$id && !$category) {
+                    $data = $this->model->getTotalArticles();
+                    echo json_encode($data);
+                    return;
+                } else if ($action == "total" && $category) {
+                    $category = $this->category->getOne($category);
+                    $data = $this->model->getTotalArticlesByCategory($category["id"]);
+                    echo json_encode($data);
+                    return;
+                } else if ($slug) {
+                    $article = $this->model->getOneBySlug($slug);
+                    if (!$article) {
+                        header('HTTP/1.1 404 Not Found');
+                        echo json_encode(['message' => 'Not found on server']);
+                        return;
+                    }
+                    $comments = $this->comment->getCommentsByArticleId($article["id"]);
+                    $data = [
+                        'article' => $article,
+                        'comments' => $comments,
+                    ];
+                    echo json_encode($data);
+                    return;
+                } else if ($id) {
                     $article = $this->model->getOne($id);
+                    if (!$article) {
+                        header('HTTP/1.1 404 Not Found');
+                        echo json_encode(['message' => 'Not found on server']);
+                        return;
+                    }
                     $comments = $this->comment->getCommentsByArticleId($id);
                     $data = [
                         'article' => $article,
                         'comments' => $comments,
                     ];
-                } elseif ($category) {
-                    $category = $this->category->getOne($category);
-                    $data = $this->model->getByCategory($category["id"]);
                 } else {
-                    $data = $this->model->getAll();
+                    $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+                    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+                    if ($category) {
+                        $category = $this->category->getOne($category);
+                        $data = $this->model->getByCategory($category["id"], $offset, $limit);
+                    } else {
+                        $data = $this->model->getAll($offset, $limit);
+                    }
                 }
                 echo json_encode($data);
                 break;
@@ -60,6 +94,7 @@ class ArticleController
                     $image_url = Utils::sanitizeInput($_POST['image_url']) ?? null;
                     $category = Utils::sanitizeInput($_POST['category']) ?? null;
                     $sources = Utils::sanitizeInput($_POST['sources']) ?? null;
+                    $slug = Utils::slugify($title);
                     if (!$title || !$shortContent || !$content || !$category || !$sources || !$image_url) {
                         header('HTTP/1.0 400 Bad Request');
                         echo json_encode(['message' => 'Bad Request', 'details' => ['title' => $title, 'short_content' => $shortContent, 'content' => $content, 'category' => $category, 'sources' => $sources, 'image_url' => $image_url]]);
@@ -67,7 +102,7 @@ class ArticleController
                     }
                     $category_id = $this->category->getOneByName($category)["id"];
                     $sources_json = json_encode($sources);
-                    $result = $this->model->post($title, $shortContent, $content, $image_url, $sources_json, $category_id);
+                    $result = $this->model->post($title, $shortContent, $content, $image_url, $sources_json, $category_id, $slug);
                     if ($result) {
                         header('HTTP/1.0 201 Created');
                         echo json_encode(['message' => 'Created']);

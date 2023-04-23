@@ -9,6 +9,14 @@ from requests.exceptions import JSONDecodeError
 from llama_cpp import Llama
 import unicodedata
 from newspaper import Article
+import torch
+from datasets import load_dataset
+from transformers import MarianMTModel, MarianTokenizer
+import time
+from tqdm import tqdm
+import os
+
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 load_dotenv()
 
@@ -54,6 +62,8 @@ categories = [
 ]
 
 llm = Llama(model_path=your_model, n_threads=4, n_ctx=4000)
+tokenizer = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-fr")
+model = MarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-en-fr")
 
 ins = """### Instruction:
 {}
@@ -79,6 +89,22 @@ def clean_text(text):
         for c in unicodedata.normalize("NFKD", text)
         if unicodedata.category(c) != "Mn"
     )
+
+
+def translate(text, device="cuda", max_new_tokens=512):
+    model.to(device)
+    tokenized_text = tokenizer(
+        text,
+        return_tensors="pt",
+        padding=True,
+        truncation=True,
+        max_length=max_new_tokens,
+    ).to(device)
+    translated_tokens = model.generate(**tokenized_text, max_new_tokens=max_new_tokens)
+    translated_text = tokenizer.batch_decode(
+        translated_tokens, skip_special_tokens=True
+    )
+    return translated_text
 
 
 def fetch_news(category):
