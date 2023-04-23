@@ -361,6 +361,9 @@ def create_post(token):
                 except RuntimeError as e:
                     print(f"Error occurred: {e}. Trying another article...")
                     break
+                except ValueError as e:
+                    print(f"Error occurred: {e}. Trying another article...")
+                    break
 
                 if not content:
                     print("Failed to summarize news. Trying again later...")
