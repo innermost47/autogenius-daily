@@ -356,7 +356,12 @@ def create_post(token):
         if news_article:
             success = False
             while not success:
-                content = summarize_news(article)
+                try:
+                    content = summarize_news(article)
+                except RuntimeError as e:
+                    print(f"Error occurred: {e}. Trying another article...")
+                    break
+
                 if not content:
                     print("Failed to summarize news. Trying again later...")
                     break
