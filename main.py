@@ -9,12 +9,13 @@ from requests.exceptions import JSONDecodeError
 from llama_cpp import Llama
 import unicodedata
 from newspaper import Article
-import torch
-from datasets import load_dataset
 from transformers import MarianMTModel, MarianTokenizer
-import time
-from tqdm import tqdm
-import os
+import logging
+
+logging.basicConfig(
+    filename=os.environ.get("YOUR_LOG_FILE"),
+    level=logging.DEBUG,
+)
 
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
@@ -60,15 +61,17 @@ model = MarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-en-fr")
 
 ins = """### Instruction:
 {}
+### Input:
+{}
 ### Response:
 """
 
 
-def generate(instruction, max_tokens):
+def generate(instruction, input, max_tokens):
     result = ""
     for x in llm(
-        ins.format(instruction),
-        stop=["### Instruction:", "### End"],
+        ins.format(instruction, input),
+        stop=["### Input:", "### End"],
         stream=True,
         max_tokens=max_tokens,
     ):
@@ -159,41 +162,38 @@ def summarize_news(article):
         return None
 
     max_tokens = 1024
-    prefix = "Please provide a large summary of the following news article, while ensuring the facts are accurately represented:"
-    prompt = prefix + " " + article
-    response = generate(clean_text(prompt), max_tokens)
-    if response.startswith(prefix):
-        response = response[len(prefix) :].strip(' "')
+    prompt = "Please provide a large summary of the following news article, while ensuring the facts are accurately represented:"
+    response = generate(clean_text(prompt), article, max_tokens)
+    if response.startswith(prompt):
+        response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
 
 
 def summarize_article(article):
     max_tokens = 255
-    prefix = "Please provide a concise summary of the following news article, while ensuring the facts are accurately represented:"
-    prompt = prefix + " " + article
-    response = generate(clean_text(prompt), max_tokens)
-    if response.startswith(prefix):
-        response = response[len(prefix) :].strip(' "')
+    prompt = "Please provide a concise summary of the following news article, while ensuring the facts are accurately represented:"
+    response = generate(clean_text(prompt), article, max_tokens)
+    if response.startswith(prompt):
+        response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
 
 
 def find_title(content):
     max_tokens = 48
-    prefix = "Generate a concise title for the following news article:"
-    prompt = prefix + " " + content
-    response = generate(clean_text(prompt), max_tokens)
-    if response.startswith(prefix):
-        response = response[len(prefix) :].strip(' "')
+    prompt = "Generate a concise title for the following news article:"
+    response = generate(clean_text(prompt), content, max_tokens)
+    if response.startswith(prompt):
+        response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
 
 
 def generate_email_response(username, message):
     max_tokens = 1024
-    prompt = f"You are autoGenius, a news blog writer, {username} sent you this email: {message} via your blog, answer him on a professional way"
-    response = generate(clean_text(prompt), max_tokens)
+    prompt = f"You are autoGenius, a news blog writer, {username} sent you this email via your blog, answer him on a professional way"
+    response = generate(clean_text(prompt), message, max_tokens)
     if response.startswith(prompt):
         response = response[len(prompt) :].strip(' "')
     print(response + "\n")
@@ -202,6 +202,7 @@ def generate_email_response(username, message):
 
 def generate_response(short_content, comments):
     max_tokens = 64
+    instruction = "Continue"
     prompt = f"@autoGenius: '{short_content}'\n"
 
     for comment in comments:
@@ -210,20 +211,19 @@ def generate_response(short_content, comments):
     name = "@autoGenius:"
     prompt += name + " "
 
-    response = generate(clean_text(prompt), max_tokens)
-    if response.startswith(name):
-        response = response[len(name) :].strip(' "')
+    response = generate(instruction, clean_text(prompt), max_tokens)
+    if response.startswith(instruction):
+        response = response[len(instruction) :].strip(' "')
     print(response + "\n")
     return response
 
 
 def extract_keywords(content):
     max_tokens = 16
-    prefix = "Summerize in only one word:"
-    prompt = prefix + " " + content
-    response = generate(clean_text(prompt), max_tokens)
-    if response.startswith(prefix):
-        response = response[len(prefix) :].strip(' "')
+    prompt = "Summerize in only one word:"
+    response = generate(clean_text(prompt), content, max_tokens)
+    if response.startswith(prompt):
+        response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
 
@@ -407,6 +407,7 @@ def create_post(token):
 
 
 if __name__ == "__main__":
+    logging.debug("Script started")
     token = login(email, password)
     post_created = False
 
@@ -461,3 +462,4 @@ if __name__ == "__main__":
                     set_email_as_answered(email_id)
             else:
                 print(f"Failed to generate response for email { email_id }. Skipping.")
+    logging.debug("Script finished")

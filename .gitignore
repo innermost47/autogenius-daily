@@ -12,3 +12,5 @@ decoder_model.h5
 training_model.h5
 execute.sh
 mails.py
+run_in_user_env.sh
+interviewer.py
