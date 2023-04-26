@@ -4,20 +4,17 @@ import urllib.parse
 import json
 import os
 from dotenv import load_dotenv
-import html
 from requests.exceptions import JSONDecodeError
 from llama_cpp import Llama
 import unicodedata
 from newspaper import Article
-from transformers import MarianMTModel, MarianTokenizer
 import logging
+import time
 
 logging.basicConfig(
     filename=os.environ.get("YOUR_LOG_FILE"),
     level=logging.DEBUG,
 )
-
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 load_dotenv()
 
@@ -33,18 +30,6 @@ headers = {
     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
 }
 
-
-class Sanitizer:
-    @staticmethod
-    def sanitize_input(input_string):
-        sanitized_input = input_string.strip().replace("'", "''")
-        return Sanitizer.convert_html_entities_to_characters(sanitized_input)
-
-    @staticmethod
-    def convert_html_entities_to_characters(string):
-        return html.unescape(string)
-
-
 categories = [
     "business",
     "entertainment",
@@ -56,8 +41,6 @@ categories = [
 ]
 
 llm = Llama(model_path=your_model, n_threads=4, n_ctx=4000)
-tokenizer = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-fr")
-model = MarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-en-fr")
 
 ins = """### Instruction:
 {}
@@ -85,22 +68,6 @@ def clean_text(text):
         for c in unicodedata.normalize("NFKD", text)
         if unicodedata.category(c) != "Mn"
     )
-
-
-def translate(text, device="cuda", max_new_tokens=512):
-    model.to(device)
-    tokenized_text = tokenizer(
-        text,
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=max_new_tokens,
-    ).to(device)
-    translated_tokens = model.generate(**tokenized_text, max_new_tokens=max_new_tokens)
-    translated_text = tokenizer.batch_decode(
-        translated_tokens, skip_special_tokens=True
-    )
-    return translated_text
 
 
 def fetch_news(category):
@@ -230,12 +197,6 @@ def extract_keywords(content):
 
 def send_to_api(category, title, content, image_url, short_content, sources, token):
     api_url = f"{my_domain_url}"
-    category = Sanitizer.sanitize_input(category)
-    title = Sanitizer.sanitize_input(title)
-    content = Sanitizer.sanitize_input(content)
-    image_url = Sanitizer.sanitize_input(image_url)
-    short_content = Sanitizer.sanitize_input(short_content)
-    sources = Sanitizer.sanitize_input(sources)
     data = {
         "category": category,
         "title": title,
@@ -253,7 +214,7 @@ def send_to_api(category, title, content, image_url, short_content, sources, tok
 def send_response(content, article_id, token):
     api_url = f"{my_domain_url}"
     data = {
-        "content": Sanitizer.sanitize_input(content),
+        "content": content,
         "article_id": article_id,
         "token": token,
         "page": "comments",
@@ -266,7 +227,7 @@ def send_response(content, article_id, token):
 def send_email(send_to, message, token):
     api_url = f"{my_domain_url}"
     data = {
-        "message": Sanitizer.sanitize_input(message),
+        "message": message,
         "botcontrol": "",
         "email": send_to,
         "token": token,
@@ -336,6 +297,7 @@ def set_email_as_answered(email_id):
 
 
 def create_post(token):
+    start_time = time.time()
     for post_attempts in range(3):
         random_category = random.choice(categories)
         news_article = fetch_news(random_category)
@@ -349,23 +311,32 @@ def create_post(token):
         if news_article:
             success = False
             while not success:
-                try:
-                    content = summarize_news(article)
-                except RuntimeError as e:
-                    print(f"Error occurred: {e}. Trying another article...")
-                    break
-                except ValueError as e:
-                    print(f"Error occurred: {e}. Trying another article...")
-                    break
-
-                if not content:
-                    print("Failed to summarize news. Trying again later...")
-                    break
-
-                short_content = summarize_article(article)
-                if not short_content:
-                    print("Failed to summarize article. Trying again later...")
-                    break
+                if time.time() - start_time > 600:
+                    print("Timed out after 10 minutes. Aborting...")
+                    return True
+                while True:
+                    try:
+                        content = summarize_news(article)
+                        if not content:
+                            print("Failed to find content. Trying again later...")
+                        elif len(content) < 750:
+                            print("Content too short. Regenerating content...")
+                        else:
+                            break
+                    except RuntimeError as e:
+                        print(f"Error occurred: {e}. Trying another article...")
+                        break
+                    except ValueError as e:
+                        print(f"Error occurred: {e}. Trying another article...")
+                        break
+                while True:
+                    short_content = summarize_article(article)
+                    if not short_content:
+                        print("Failed to generate short content. Trying again later...")
+                    elif len(short_content) < 255 & len(short_content) > 750:
+                        print("Short content not good. Regenerating short content...")
+                    else:
+                        break
 
                 while True:
                     title = find_title(short_content)
@@ -376,15 +347,19 @@ def create_post(token):
                     else:
                         break
 
-                keywords = extract_keywords(content)
-                if not keywords:
-                    print("Failed to find keywords. Trying again later...")
-                    break
+                while True:
+                    keywords = extract_keywords(content)
+                    if not keywords:
+                        print("Failed to find keywords. Trying again later...")
+                    else:
+                        break
 
-                image_url = fetch_image_url(keywords)
-                if not image_url:
-                    print("Failed to find image. Trying again later...")
-                    break
+                while True:
+                    image_url = fetch_image_url(keywords)
+                    if not image_url:
+                        print("Failed to find image. Trying again later...")
+                    else:
+                        break
 
                 status = send_to_api(
                     random_category,

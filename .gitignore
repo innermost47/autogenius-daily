@@ -2,7 +2,10 @@
 back/vendor
 back/.htaccess
 back/.env
-front
+front/.htaccess
+front/tarteaucitronjs
+front/script/config.js
+front/script/about.js
 custom_bot.py
 .vscode
 test.py
