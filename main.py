@@ -91,7 +91,7 @@ def fetch_news(category):
             }
             articles_with_sources.append(article_with_source)
 
-        return random.choice(articles_with_sources) if articles_with_sources else None
+        return articles_with_sources
 
     return []
 
@@ -126,9 +126,13 @@ def summarize_news(article):
     prompt = "Please provide a large summary of the following news article, while ensuring the facts are accurately represented:"
     response = ""
     while len(response) < 750 or not response :
-        response = generate(clean_text(prompt), article, max_tokens)
-        if response.startswith(prompt):
-            response = response[len(prompt):].strip(' "')
+        try:
+            response = generate(clean_text(prompt), article, max_tokens)
+            if response.startswith(prompt):
+                response = response[len(prompt):].strip(' "')
+        except Exception as e:
+            print(f"Error occurred while generating summary: {e}")
+            return False
     print(response + "\n")
     return response
 
@@ -279,58 +283,69 @@ def set_email_as_answered(email_id):
             f"Error set email {email_id} as answered. Status code: {response.status_code}"
         )
 
-def create_post(token):
-    random_category = random.choice(categories)
-    trial_number = 3
-    success = False
-    while trial_number > 0 :
-        try:
-            news_article = fetch_news(random_category)
-            success = True
-            break
-        except RuntimeError as e:
+def create_post(token, total_post_trial = 3):
+    if total_post_trial > 0 :
+        random_category = random.choice(categories)
+        trial_number = 3
+        success = False
+        while trial_number > 0 :
+            try:
+                articles_with_sources = fetch_news(random_category)
+                if articles_with_sources :
+                    news_article = random.choice(articles_with_sources)
+                    success = True
+                    break
+                else:
+                    print("No articles found. Trying another article...")
+                    trial_number -= 1
+                    continue
+            except RuntimeError as e:
+                trial_number -= 1
+                print(f"Error occurred: {e}. Trying another article...")
+                continue
+            except ValueError as e:
+                trial_number -= 1
+                print(f"Error occurred: {e}. Trying another article...")
+                continue
+        if not success:
+            print("Failed to fetch news. Givin' up")
+            return
+        sources = [news_article["url"]] if news_article else []
+        article = extract_article_content(news_article["url"])
+        news_dict = {}
+        for i, url in enumerate(sources):
+            news_dict[f"news{i+1}"] = url
+        sources_json = json.dumps(news_dict)
+        content = summarize_news(article)
+        if not content: 
+            return create_post(token, total_post_trial - 1)
+        short_content = summarize_article(article)
+        title = find_title(short_content)
+        keywords = extract_keywords(content)
+        success = False
+        trial_number = 3
+        image_url = None
+        while trial_number > 0 and image_url is None:
+            image_url = fetch_image_url(keywords)
             trial_number -= 1
-            print(f"Error occurred: {e}. Trying another article...")
-            continue
-        except ValueError as e:
-            trial_number -= 1
-            print(f"Error occurred: {e}. Trying another article...")
-            continue
-    if not success:
-        print("Failed to fetch news. Givin' up")
-        return
-    sources = [news_article["url"]] if news_article else []
-    article = extract_article_content(news_article["url"])
-    news_dict = {}
-    for i, url in enumerate(sources):
-        news_dict[f"news{i+1}"] = url
-    sources_json = json.dumps(news_dict)
-    content = summarize_news(article)
-    short_content = summarize_article(article)
-    title = find_title(short_content)
-    keywords = extract_keywords(content)
-    success = False
-    trial_number = 3
-    image_url = None
-    while trial_number > 0 and image_url is None:
-        image_url = fetch_image_url(keywords)
-        trial_number -= 1
-        if image_url is not None:
-            success = True
-    if not success:
-        print("Failed to fetch image. Givin' up")
-        return
-    status = send_post(
-        random_category,
-        title,
-        content,
-        image_url,
-        short_content,
-        sources_json,
-        token,
-    )
-    if status == 201:
-        print("Post created.")
+            if image_url is not None:
+                success = True
+        if not success:
+            print("Failed to fetch image. Givin' up")
+            return
+        status = send_post(
+            random_category,
+            title,
+            content,
+            image_url,
+            short_content,
+            sources_json,
+            token,
+        )
+        if status == 201:
+            print("Post created.")
+        else:
+            print("Failed to create a post")
     else:
         print("Failed to create a post")
 
