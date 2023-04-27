@@ -110,7 +110,6 @@ def fetch_image_url(query):
     try:
         response = requests.get(url, headers=pexels_headers)
         response.raise_for_status()
-
         try:
             json_data = response.json()
             image_url = json_data["photos"][0]["src"]["large"]
@@ -118,84 +117,82 @@ def fetch_image_url(query):
             print(f"Invalid JSON response from {url}")
             return None
         return image_url
-
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while making a request to {url}: {e}")
         return None
 
-
 def summarize_news(article):
-    if not article:
-        return None
-
     max_tokens = 1024
     prompt = "Please provide a large summary of the following news article, while ensuring the facts are accurately represented:"
-    response = generate(clean_text(prompt), article, max_tokens)
-    if response.startswith(prompt):
-        response = response[len(prompt) :].strip(' "')
+    response = ""
+    while len(response) < 750 or not response :
+        response = generate(clean_text(prompt), article, max_tokens)
+        if response.startswith(prompt):
+            response = response[len(prompt):].strip(' "')
     print(response + "\n")
     return response
-
 
 def summarize_article(article):
     max_tokens = 255
     prompt = "Please provide a concise summary of the following news article, while ensuring the facts are accurately represented:"
-    response = generate(clean_text(prompt), article, max_tokens)
-    if response.startswith(prompt):
-        response = response[len(prompt) :].strip(' "')
+    response = ""
+    while len(response) < 255 & len(response) > 750 or not response :
+        response = generate(clean_text(prompt), article, max_tokens)
+        if response.startswith(prompt):
+            response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
-
 
 def find_title(content):
     max_tokens = 48
     prompt = "Generate a concise title for the following news article:"
-    response = generate(clean_text(prompt), content, max_tokens)
-    if response.startswith(prompt):
-        response = response[len(prompt) :].strip(' "')
+    response = ""
+    while len(response) > 255 or not response :
+        response = generate(clean_text(prompt), content, max_tokens)
+        if response.startswith(prompt):
+            response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
-
 
 def generate_email_response(username, message):
     max_tokens = 1024
     prompt = f"You are autoGenius, a news blog writer, {username} sent you this email via your blog, answer him on a professional way"
-    response = generate(clean_text(prompt), message, max_tokens)
-    if response.startswith(prompt):
-        response = response[len(prompt) :].strip(' "')
+    reponse = ""
+    while not response or len(response) < 255 :
+        response = generate(clean_text(prompt), message, max_tokens)
+        if response.startswith(prompt):
+            response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
 
-
-def generate_response(short_content, comments):
+def generate_comment(short_content, comments):
     max_tokens = 64
     instruction = "Continue"
     prompt = f"@autoGenius: '{short_content}'\n"
-
     for comment in comments:
         prompt += f"@{comment['username']}: {comment['content']}\n"
-
     name = "@autoGenius:"
     prompt += name + " "
-
-    response = generate(instruction, clean_text(prompt), max_tokens)
-    if response.startswith(instruction):
-        response = response[len(instruction) :].strip(' "')
+    response = ""
+    while not response or len(response) < 35 or len(response) > 1500 :
+        response = generate(instruction, clean_text(prompt), max_tokens)
+        if response.startswith(instruction):
+            response = response[len(instruction) :].strip(' "')
     print(response + "\n")
     return response
-
 
 def extract_keywords(content):
     max_tokens = 16
     prompt = "Summerize in only one word:"
-    response = generate(clean_text(prompt), content, max_tokens)
-    if response.startswith(prompt):
-        response = response[len(prompt) :].strip(' "')
+    response = ""
+    while len(response) > 100 or not response :
+        response = generate(clean_text(prompt), content, max_tokens)
+        if response.startswith(prompt):
+            response = response[len(prompt) :].strip(' "')
     print(response + "\n")
     return response
 
-
-def send_to_api(category, title, content, image_url, short_content, sources, token):
+def send_post(category, title, content, image_url, short_content, sources, token):
     api_url = f"{my_domain_url}"
     data = {
         "category": category,
@@ -210,8 +207,7 @@ def send_to_api(category, title, content, image_url, short_content, sources, tok
     response = requests.post(api_url, data=data, headers=headers)
     return response.status_code
 
-
-def send_response(content, article_id, token):
+def send_comment(content, article_id, token):
     api_url = f"{my_domain_url}"
     data = {
         "content": content,
@@ -219,10 +215,8 @@ def send_response(content, article_id, token):
         "token": token,
         "page": "comments",
     }
-
     response = requests.post(api_url, data=data, headers=headers)
     return response.status_code
-
 
 def send_email(send_to, message, token):
     api_url = f"{my_domain_url}"
@@ -234,10 +228,8 @@ def send_email(send_to, message, token):
         "sender": "AutoGenius Daily",
         "page": "email",
     }
-
     response = requests.post(api_url, data=data, headers=headers)
     return response.status_code
-
 
 def login(email, password):
     api_url = f"{my_domain_url}"
@@ -255,12 +247,9 @@ def login(email, password):
         exit()
     return None
 
-
 def fetch_comments(token):
     api_url = f"{my_domain_url}?page=comments&token={token}"
-
     response = requests.get(api_url, headers=headers)
-
     if response.status_code == 200:
         return response.json()
     else:
@@ -269,23 +258,18 @@ def fetch_comments(token):
         )
         return []
 
-
 def fetch_emails(token):
     api_url = f"{my_domain_url}?page=email&token={token}"
-
     response = requests.get(api_url, headers=headers)
-
     if response.status_code == 200:
         return response.json()
     else:
         print(f"Error fetching unanswered emails. Status code: {response.status_code}")
         return []
 
-
 def set_email_as_answered(email_id):
     api_url = f"{my_domain_url}?page=email&id={email_id}&token={token}"
     response = requests.get(api_url, headers=headers)
-
     if response.status_code == 200:
         print(
             f"Success set email {email_id} as answered. Status code: {response.status_code}"
@@ -295,122 +279,72 @@ def set_email_as_answered(email_id):
             f"Error set email {email_id} as answered. Status code: {response.status_code}"
         )
 
-
 def create_post(token):
-    start_time = time.time()
-    for post_attempts in range(3):
-        random_category = random.choice(categories)
-        news_article = fetch_news(random_category)
-        sources = [news_article["url"]] if news_article else []
-        article = extract_article_content(news_article["url"])
-        news_dict = {}
-        for i, url in enumerate(sources):
-            news_dict[f"news{i+1}"] = url
-        sources_json = json.dumps(news_dict)
-
-        if news_article:
-            success = False
-            while not success:
-                if time.time() - start_time > 600:
-                    print("Timed out after 10 minutes. Aborting...")
-                    return True
-                while True:
-                    try:
-                        content = summarize_news(article)
-                        if not content:
-                            print("Failed to find content. Trying again later...")
-                        elif len(content) < 750:
-                            print("Content too short. Regenerating content...")
-                        else:
-                            break
-                    except RuntimeError as e:
-                        print(f"Error occurred: {e}. Trying another article...")
-                        break
-                    except ValueError as e:
-                        print(f"Error occurred: {e}. Trying another article...")
-                        break
-                while True:
-                    short_content = summarize_article(article)
-                    if not short_content:
-                        print("Failed to generate short content. Trying again later...")
-                    elif len(short_content) < 255 & len(short_content) > 750:
-                        print("Short content not good. Regenerating short content...")
-                    else:
-                        break
-
-                while True:
-                    title = find_title(short_content)
-                    if not title:
-                        print("Failed to find title. Trying again later...")
-                    elif len(title) > 255:
-                        print("Title too long. Regenerating title...")
-                    else:
-                        break
-
-                while True:
-                    keywords = extract_keywords(content)
-                    if not keywords:
-                        print("Failed to find keywords. Trying again later...")
-                    else:
-                        break
-
-                while True:
-                    image_url = fetch_image_url(keywords)
-                    if not image_url:
-                        print("Failed to find image. Trying again later...")
-                    else:
-                        break
-
-                status = send_to_api(
-                    random_category,
-                    title,
-                    content,
-                    image_url,
-                    short_content,
-                    sources_json,
-                    token,
-                )
-                print(f"Article submitted with status code {status}")
-                success = True
-                return True
-
-        else:
-            print("Failed to fetch news. Try again later.")
-
-    print("Failed to create a post after 3 attempts.")
-    return False
-
-
-if __name__ == "__main__":
-    logging.debug("Script started")
-    token = login(email, password)
-    post_created = False
-
-    while not post_created:
-        post_created = create_post(token)
-
-        if post_created:
-            print("Post sent.")
-        else:
-            print("Failed to create a post after 3 attempts. Exiting...")
+    random_category = random.choice(categories)
+    trial_number = 3
+    success = False
+    while trial_number > 0 :
+        try:
+            news_article = fetch_news(random_category)
+            success = True
             break
+        except RuntimeError as e:
+            trial_number -= 1
+            print(f"Error occurred: {e}. Trying another article...")
+            continue
+        except ValueError as e:
+            trial_number -= 1
+            print(f"Error occurred: {e}. Trying another article...")
+            continue
+    if not success:
+        print("Failed to fetch news. Givin' up")
+        return
+    sources = [news_article["url"]] if news_article else []
+    article = extract_article_content(news_article["url"])
+    news_dict = {}
+    for i, url in enumerate(sources):
+        news_dict[f"news{i+1}"] = url
+    sources_json = json.dumps(news_dict)
+    content = summarize_news(article)
+    short_content = summarize_article(article)
+    title = find_title(short_content)
+    keywords = extract_keywords(content)
+    success = False
+    trial_number = 3
+    image_url = None
+    while trial_number > 0 and image_url is None:
+        image_url = fetch_image_url(keywords)
+        trial_number -= 1
+        if image_url is not None:
+            success = True
+    if not success:
+        print("Failed to fetch image. Givin' up")
+        return
+    status = send_post(
+        random_category,
+        title,
+        content,
+        image_url,
+        short_content,
+        sources_json,
+        token,
+    )
+    if status == 201:
+        print("Post created.")
+    else:
+        print("Failed to create a post")
 
+def answer_comments(token):
     unanswered_comments = fetch_comments(token)
-
     if unanswered_comments:
         for article in unanswered_comments:
             article_id = article["id"]
             short_content = article["short_content"]
             comments = article["comments"]
             if comments != None:
-                while True:
-                    response = generate_response(short_content, comments)
-                    if len(response) > 255:
-                        print("Comment too long. Regenerating title...")
-                    else:
-                        break
+                response = generate_comment(short_content, comments)
                 if response:
-                    status = send_response(response, article_id, token)
+                    status = send_comment(response, article_id, token)
                     print(
                         f"Comments for article { article_id } replied with status code {status}"
                     )
@@ -418,9 +352,9 @@ if __name__ == "__main__":
                     print(
                         f"Failed to generate response for comment of article { article_id }. Skipping."
                     )
-
+                    
+def answer_emails(token):
     unanswered_emails = fetch_emails(token)
-
     if unanswered_emails:
         for unanswerd_email in unanswered_emails:
             email_id = unanswerd_email["id"]
@@ -436,5 +370,12 @@ if __name__ == "__main__":
                 if status == 200:
                     set_email_as_answered(email_id)
             else:
-                print(f"Failed to generate response for email { email_id }. Skipping.")
+                print(f"Failed to generate response for email { email_id }. Skipping.") 
+
+if __name__ == "__main__":
+    logging.debug("Script started")
+    token = login(email, password)
+    create_post(token)
+    answer_comments(token)
+    answer_emails(token)
     logging.debug("Script finished")
