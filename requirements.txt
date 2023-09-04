@@ -2,3 +2,5 @@ requests
 python-dotenv
 llama-cpp-python
 newspaper3k
+langchain
+spacy
