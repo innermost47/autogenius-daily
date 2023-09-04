@@ -1,8 +1,9 @@
 import os
 from dotenv import load_dotenv
-from langchain.llms import LlamaCpp
+from llama_cpp import Llama
 import logging
 import spacy
+import sys
 
 load_dotenv()
 
@@ -28,14 +29,12 @@ class Configuration:
         self.model = os.environ.get("MODEL")
 
     def init_model(self):
-        self.llm = LlamaCpp(
+        self.llm = Llama(
             model_path=self.model,
-            temperature=0.7,
-            top_p=0.95,
             n_ctx=4000,
-            max_tokens=2048,
         )
-        self.nlp = spacy.load("fr_core_news_sm")
+        model_path = os.path.join(sys._MEIPASS, 'fr_core_news_sm')
+        self.nlp = spacy.load(model_path)
 
     def init_misc(self):
         self.headers = {

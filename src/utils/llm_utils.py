@@ -18,15 +18,14 @@ class LlmUtils:
 
     @classmethod
     def generate(cls, instruction, input, max_tokens):
-        cls._config.llm.max_tokens = max_tokens
         prompt = cls.generate_prompt(instruction=instruction, input=input)
-        result = cls._config.llm.predict(prompt)
-        return result
+        result = cls._config.llm(prompt=prompt, max_tokens=max_tokens)
+        return result["choices"][0]["text"]
 
     @classmethod
     def summarize_news(cls, article):
         cls._config.logger.debug("Summarizing news")
-        prompt = "Vous êtes autogenius daily, un rédacteur de blog, fournissez un large résumé dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
+        prompt = "Fournissez un large résumé dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
         response = cls.generate(prompt, article, 2048)
         if response.startswith(prompt):
             response = response[len(prompt) :].strip(' "')
@@ -35,7 +34,7 @@ class LlmUtils:
     @classmethod
     def summarize_article(cls, article):
         cls._config.logger.debug("Summarizing article for description")
-        prompt = "Vous êtes autogenius daily, un rédacteur de blog, fournissez un résumé concis dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
+        prompt = "Fournissez un résumé concis dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
         response = cls.generate(prompt, article, 1024)
         if response.startswith(prompt):
             response = response[len(prompt) :].strip(' "')
@@ -44,7 +43,7 @@ class LlmUtils:
     @classmethod
     def find_title(cls, content):
         cls._config.logger.debug("Finding title")
-        prompt = "Vous êtes autogenius daily, un rédacteur de blog, générez un titre concis dans un style journalistique pour l'article d'actualité suivant : "
+        prompt = "Générez un titre concis dans un style journalistique pour l'article d'actualité suivant : "
         response = cls.generate(prompt, content, 128)
         if response.startswith(prompt):
             response = response[len(prompt) :].strip(' "')
@@ -53,7 +52,7 @@ class LlmUtils:
     @classmethod
     def generate_email_response(cls, username, message, email_id):
         cls._config.logger.debug(f"Generating answer for email {email_id}")
-        prompt = f"Vous êtes autogenius daily, rédacteur d'un blog d'actualité, {username} vous a envoyé cet email via votre blog, répondez-lui de manière professionnelle"
+        prompt = f"{username} vous a envoyé cet email via votre blog, répondez-lui de manière professionnelle"
         response = cls.generate(prompt, message, 2048)
         if response.startswith(prompt):
             response = response[len(prompt) :].strip(' "')
