@@ -4,3 +4,7 @@ llama-cpp-python
 newspaper3k
 langchain
 spacy
+pyinstaller
+pyparsing
+cryptography
+pyopenssl
