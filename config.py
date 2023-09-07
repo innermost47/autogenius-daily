@@ -33,7 +33,10 @@ class Configuration:
             model_path=self.model,
             n_ctx=4000,
         )
-        model_path = os.path.join(sys._MEIPASS, 'fr_core_news_sm')
+        try:
+            model_path = os.path.join(sys._MEIPASS, "fr_core_news_sm")
+        except AttributeError:
+            model_path = "fr_core_news_sm"
         self.nlp = spacy.load(model_path)
 
     def init_misc(self):

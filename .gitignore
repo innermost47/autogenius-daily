@@ -16,6 +16,7 @@ src/utils/__pycache__
 __pycache__
 env
 main.spec
+main.spec.txt
 dist
 execute.sh
 run_in_user_env.sh
