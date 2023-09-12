@@ -25,7 +25,7 @@ class LlmUtils:
     @classmethod
     def summarize_news(cls, article):
         cls._config.logger.debug("Summarizing news")
-        prompt = "Fournissez un large résumé dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
+        prompt = "Fournissez un large résumé en français et dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
         response = cls.generate(prompt, article, 2048)
         if response.startswith(prompt):
             response = response[len(prompt) :].strip(' "')
@@ -34,7 +34,7 @@ class LlmUtils:
     @classmethod
     def summarize_article(cls, article):
         cls._config.logger.debug("Summarizing article for description")
-        prompt = "Fournissez un résumé concis dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
+        prompt = "Fournissez un résumé concis en français et dans un style journalistique de l'article d'actualité suivant, tout en vous assurant que les faits sont représentés avec précision : "
         response = cls.generate(prompt, article, 1024)
         if response.startswith(prompt):
             response = response[len(prompt) :].strip(' "')
@@ -43,7 +43,7 @@ class LlmUtils:
     @classmethod
     def find_title(cls, content):
         cls._config.logger.debug("Finding title")
-        prompt = "Générez un titre concis dans un style journalistique pour l'article d'actualité suivant : "
+        prompt = "Générez un titre concis en français et dans un style journalistique pour l'article d'actualité suivant : "
         response = cls.generate(prompt, content, 128)
         if response.startswith(prompt):
             response = response[len(prompt) :].strip(' "')
