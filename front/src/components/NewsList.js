@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { truncateText } from "../utils/textUtils";
 
 function NewsList() {
   const [news, setNews] = useState([]);
@@ -57,7 +58,9 @@ function NewsList() {
                 />
                 <div className="card-body">
                   <h5 className="card-title">{item.title}</h5>
-                  <p className="card-text">{item.short_content}</p>
+                  <p className="card-text text-justify">
+                    {truncateText(item.short_content, 512)}
+                  </p>
                   <p className="card-text text-muted blockquote-footer mt-3">
                     {formattedDate}
                   </p>

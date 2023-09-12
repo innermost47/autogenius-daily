@@ -33,6 +33,15 @@ function NewsDetail() {
 
   const articleDate = new Date(newsItem.article.created_at);
   const formattedDate = formatDate(articleDate);
+  const sourcesString = newsItem.article.sources;
+  const sourcesDataIntermediate = JSON.parse(sourcesString);
+  const sourcesData = JSON.parse(sourcesDataIntermediate);
+  let source = "";
+  for (const src in sourcesData) {
+    if (sourcesData.hasOwnProperty(src)) {
+      source = sourcesData[src];
+    }
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -89,8 +98,24 @@ function NewsDetail() {
         />
         <h2 className="mb-4">{newsItem.article.title}</h2>
         <p className="text-muted blockquote-footer mt-3">{formattedDate}</p>
-        <p className="mb-4">{newsItem.article.content}</p>
+        <p className="text-wrap text-justify">{newsItem.article.content}</p>
+        <a href={source} target="_blank" rel="noreferrer" className="mb-4 ">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            className="bi bi-link me-2 mb-1"
+            viewBox="0 0 16 16"
+          >
+            <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z" />
+            <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z" />
+          </svg>
+          Source
+        </a>
+        <hr />
         <h3>Commentaires</h3>
+
         {newsItem.comments.length > 0 ? (
           <div className="row comment-container">
             {newsItem.comments.map((comment) => (

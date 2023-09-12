@@ -90,3 +90,7 @@ code {
   right: 1rem;
   z-index: 1050;
 }
+
+.text-justify {
+  text-align: justify;
+}
