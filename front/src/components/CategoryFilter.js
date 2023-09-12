@@ -21,10 +21,12 @@ function CategoryFilter({ setCategory }) {
             onChange={(e) => setCategory(e.target.value)}
             className="form-select mt-1"
           >
-            <option value="all">Tous</option>
+            <option value="all" id="all">
+              Tous
+            </option>
             {categoryItem &&
               categoryItem.map((item) => (
-                <option key={item.id} value={item.id}>
+                <option key={item.id} value={item.id} id={item.name}>
                   {capitalizeFirstLetter(item.name)}
                 </option>
               ))}

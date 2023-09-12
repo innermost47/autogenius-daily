@@ -3,9 +3,7 @@ import React from "react";
 function Legals() {
   return (
     <>
-      <h5 className="mb-4 mt-4">
-        Avertissement légal pour le blog géré par le modèle similaire à GPT
-      </h5>
+      <h5 className="mb-4 mt-4">Mentions légales</h5>
       <p>
         <strong>Dernière mise à jour :</strong> 17 avril 2023
       </p>

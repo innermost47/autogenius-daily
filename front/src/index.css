@@ -83,3 +83,10 @@ code {
   height: 300px;
   object-fit: cover;
 }
+
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 1050;
+}
