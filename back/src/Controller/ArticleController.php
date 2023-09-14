@@ -77,9 +77,15 @@ class ArticleController
                     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : null;
                     if ($category) {
                         $category = $this->category->getOne($category);
-                        $data = $this->model->getByCategory($category["id"], $offset, $limit);
+                        if ($limit !== null) {
+                            $data = $this->model->getByCategoryWithLimit($category["id"], $offset, $limit);
+                        } else {
+                            $data = $this->model->getByCategory($category["id"]);
+                        }
+                    } else if ($limit !== null) {
+                        $data = $this->model->getAllWithLimit($offset, $limit);
                     } else {
-                        $data = $this->model->getAll($offset, $limit);
+                        $data = $this->model->getAll();
                     }
                 }
                 echo json_encode($data);

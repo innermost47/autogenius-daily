@@ -15,8 +15,8 @@ import Login from "./components/Login";
 import CustomNavbar from "./components/CustomNavbar";
 import Register from "./components/Register";
 
-axios.defaults.baseURL = "https://api.autogeniusdaily.com/";
-
+// axios.defaults.baseURL = "https://api.autogeniusdaily.com/";
+axios.defaults.baseURL = "http://localhost:8001/";
 function App() {
   return (
     <AuthProvider>

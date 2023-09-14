@@ -14,17 +14,20 @@ class Article
         $this->pdo = Database::getInstance();
     }
 
-    public function getAll($offset, $limit)
+    public function getAll()
     {
         $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id ORDER BY articles.created_at DESC";
-        if ($limit !== null) {
-            $query .= " LIMIT :offset, :limit";
-        }
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllWithLimit($offset, $limit)
+    {
+        $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id ORDER BY articles.created_at DESC LIMIT :offset, :limit";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-        if ($limit !== null) {
-            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        }
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -47,8 +50,16 @@ class Article
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getByCategory($category_id)
+    {
+        $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id WHERE categories.id = :category_id ORDER BY articles.created_at DESC";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':category_id', $category_id);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-    public function getByCategory($category_id, $offset, $limit)
+    public function getByCategoryWithLimit($category_id, $offset, $limit)
     {
         $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id WHERE categories.id = :category_id ORDER BY articles.created_at DESC LIMIT :offset, :limit";
         $stmt = $this->pdo->prepare($query);

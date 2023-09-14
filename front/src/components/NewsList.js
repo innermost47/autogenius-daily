@@ -16,11 +16,9 @@ function NewsList() {
 
   useEffect(() => {
     let url = axios.defaults.baseURL + "index.php?page=articles";
-
     if (category !== "all") {
       url += `&category=${category}`;
     }
-
     axios.get(url).then((response) => {
       setNews(response.data);
     });
