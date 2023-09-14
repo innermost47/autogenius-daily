@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { emailRegex } from "../utils/textUtils";
 import { useAuth } from "../auth/authContext";
 import axios from "axios";
@@ -10,9 +10,22 @@ function Contact() {
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [botControl, setBotControl] = useState("");
+  const [disabled, setDisabled] = useState(true);
   const [error, setError] = useState(null);
   const { token } = useAuth();
   const { showToast } = useContext(ToastContext);
+
+  useEffect(() => {
+    if (name.trim() === "" || email.trim() === "" || message.trim() === "") {
+      setDisabled(true);
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      setDisabled(true);
+      return;
+    }
+    setDisabled(false);
+  }, [name, email, message]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,6 +68,8 @@ function Contact() {
       }
     } catch (error) {
       setError("Erreur lors de la connexion. Veuillez réessayer.");
+    } finally {
+      setDisabled(true);
     }
   };
 
@@ -121,7 +136,7 @@ function Contact() {
           value={botControl}
           onChange={(e) => setBotControl(e.target.value)}
         />
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" disabled={disabled}>
           Envoyer
         </button>
         {error && <p className="text-danger mt-3">{error}</p>}
