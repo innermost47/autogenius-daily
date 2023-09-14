@@ -16,10 +16,15 @@ class Article
 
     public function getAll($offset, $limit)
     {
-        $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id ORDER BY articles.created_at DESC LIMIT :offset, :limit";
+        $query = "SELECT articles.*, categories.name as category_name FROM articles INNER JOIN categories ON articles.category_id = categories.id ORDER BY articles.created_at DESC";
+        if ($limit !== null) {
+            $query .= " LIMIT :offset, :limit";
+        }
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        if ($limit !== null) {
+            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

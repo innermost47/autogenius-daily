@@ -74,7 +74,7 @@ class ArticleController
                     ];
                 } else {
                     $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-                    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+                    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : null;
                     if ($category) {
                         $category = $this->category->getOne($category);
                         $data = $this->model->getByCategory($category["id"], $offset, $limit);
