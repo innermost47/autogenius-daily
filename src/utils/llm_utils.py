@@ -46,7 +46,7 @@ class LlmUtils:
         prompt = "Générez un titre concis en français et dans un style journalistique pour l'article d'actualité suivant : "
         response = cls.generate(prompt, content, 128)
         if response.startswith(prompt):
-            response = response[len(prompt) :].strip(' "')
+            response = response[len(prompt) :].strip(' "').replace('"', "")
         return response.strip()
 
     @classmethod

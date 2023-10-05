@@ -14,7 +14,7 @@ class ApiUtils:
             api_url = f"{cls._config.api_url}"
             data = {
                 "category": category,
-                "title": title,
+                "title": title[:255],
                 "short_content": short_content,
                 "sources": sources,
                 "content": content,
