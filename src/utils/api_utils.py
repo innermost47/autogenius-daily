@@ -29,7 +29,7 @@ class ApiUtils:
         except requests.Timeout:
             return "Request timed out."
         except requests.RequestException as error:
-            return f"An error occurred while fetching the emails: {error}"
+            return f"An error occurred while sending article: {error}"
         except ValueError as ve:
             return str(ve)
 
@@ -51,7 +51,7 @@ class ApiUtils:
         except requests.Timeout:
             return "Request timed out."
         except requests.RequestException as error:
-            return f"An error occurred while fetching the emails: {error}"
+            return f"An error occurred while sending comment: {error}"
         except ValueError as ve:
             return str(ve)
 
@@ -76,7 +76,7 @@ class ApiUtils:
         except requests.Timeout:
             return "Request timed out."
         except requests.RequestException as error:
-            return f"An error occurred while fetching the emails: {error}"
+            return f"An error occurred while sending email: {error}"
         except ValueError as ve:
             return str(ve)
 
@@ -101,7 +101,7 @@ class ApiUtils:
         except requests.Timeout:
             return "Request timed out."
         except requests.RequestException as error:
-            return f"An error occurred while fetching the emails: {error}"
+            return f"An error occurred while trying to log: {error}"
         except ValueError as ve:
             return str(ve)
 
@@ -118,7 +118,7 @@ class ApiUtils:
         except requests.Timeout:
             return "Request timed out."
         except requests.RequestException as error:
-            return f"An error occurred while fetching the emails: {error}"
+            return f"An error occurred while fetching comments: {error}"
         except ValueError as ve:
             return str(ve)
 
@@ -151,6 +151,6 @@ class ApiUtils:
         except requests.Timeout:
             return "Request timed out."
         except requests.RequestException as error:
-            return f"An error occurred while fetching the emails: {error}"
+            return f"An error occurred while setting email as answered: {error}"
         except ValueError as ve:
             return str(ve)

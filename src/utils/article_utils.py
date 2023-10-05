@@ -53,6 +53,6 @@ class ArticleUtils:
         except requests.Timeout:
             return "Request timed out."
         except requests.RequestException as error:
-            return f"An error occurred while fetching the emails: {error}"
+            return f"An error occurred while fetching news: {error}"
         except ValueError as ve:
             return str(ve)
