@@ -36,6 +36,9 @@ def create_post(token):
 
 def answer_comments(token):
     unanswered_comments = ApiUtils.fetch_comments(token)
+    if isinstance(unanswered_comments, str):
+        config.logger.error(f"Error fetching comments: {unanswered_comments}")
+        return
     if unanswered_comments:
         for article in unanswered_comments:
             article_id = article["id"]
@@ -51,6 +54,9 @@ def answer_comments(token):
 
 def answer_emails(token):
     unanswered_emails = ApiUtils.fetch_emails(token)
+    if isinstance(unanswered_emails, str):
+        config.logger.error(f"Error fetching emails: {unanswered_emails}")
+        return
     if unanswered_emails:
         for unanswerd_email in unanswered_emails:
             email_id = unanswerd_email["id"]
