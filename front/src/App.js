@@ -15,12 +15,13 @@ import Login from "./components/Login";
 import CustomNavbar from "./components/CustomNavbar";
 import Register from "./components/Register";
 
-// axios.defaults.baseURL = "https://api.autogeniusdaily.com/";
-axios.defaults.baseURL = "http://localhost:8001/";
+axios.defaults.baseURL =
+  "https://anthony-charretier.freeboxos.fr/autogenius-api/";
+//axios.defaults.baseURL = "http://localhost:8001/";
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <ScrollToTop />
         <CustomNavbar />
         <div className="container" id="main">
