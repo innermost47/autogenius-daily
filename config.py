@@ -29,10 +29,7 @@ class Configuration:
         self.model = os.environ.get("MODEL")
 
     def init_model(self):
-        self.llm = Llama(
-            model_path=self.model,
-            n_ctx=4000,
-        )
+        self.llm = Llama(model_path=self.model, n_ctx=4000, n_gpu_layers=33)
         try:
             model_path = os.path.join(sys._MEIPASS, "fr_core_news_sm")
         except AttributeError:
