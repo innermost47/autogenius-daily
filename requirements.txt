@@ -8,3 +8,4 @@ pyinstaller
 pyparsing
 cryptography
 pyopenssl
+bs4
