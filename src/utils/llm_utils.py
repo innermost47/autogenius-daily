@@ -19,7 +19,16 @@ class LlmUtils:
     @classmethod
     def generate(cls, instruction, input, max_tokens):
         prompt = cls.generate_prompt(instruction=instruction, input=input)
-        result = cls._config.llm(prompt=prompt, max_tokens=max_tokens)
+        result = cls._config.llm(
+            prompt=prompt,
+            max_tokens=max_tokens,
+            stop=[
+                "<|UTILISATEUR|>:",
+                "<|ASSISTANT|>:",
+                "<|UTILISATEUR|>",
+                "<|ASSISTANT|>",
+            ],
+        )
         return result["choices"][0]["text"]
 
     @classmethod
