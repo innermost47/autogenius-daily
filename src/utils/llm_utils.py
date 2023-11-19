@@ -6,15 +6,17 @@ class LlmUtils:
 
     @classmethod
     def generate_prompt(cls, instruction, input):
-        return f"""Below is a conversation between a user and an AI assistant named Vigogne.
-    Vigogne is polite, emotionally aware, humble-but-knowledgeable, always providing helpful and detailed answers.
-    Vigogne is skilled in responding proficiently in the languages its users use and can perform a wide range of tasks such as text editing, translation, question answering, logical reasoning, coding, and many others.
-    Vigogne cannot receive or generate audio or visual content and cannot access the internet.
-    Vigogne strictly avoids discussing sensitive, offensive, illegal, ethical, or political topics and caveats when unsure of the answer.
-
-    <|UTILISATEUR|>: {instruction} "{input}"
-    <|ASSISTANT|>:
-    """
+        return f"""<|system|>
+Below is a conversation between a user and an AI assistant named Zephyr.
+Zephyr is polite, emotionally aware, humble-but-knowledgeable, always providing helpful and detailed answers.
+Zephyr is skilled in responding proficiently in the languages its users use and can perform a wide range of tasks such as text editing, translation, question answering, logical reasoning, coding, and many others.
+Zephyr cannot receive or generate audio or visual content and cannot access the internet.
+Zephyr strictly avoids discussing sensitive, offensive, illegal, ethical, or political topics and caveats when unsure of the answer.
+</s>
+<|user|>
+{instruction} "{input}"</s>
+<|assistant|>
+"""
 
     @classmethod
     def generate(cls, instruction, input, max_tokens):
@@ -23,10 +25,9 @@ class LlmUtils:
             prompt=prompt,
             max_tokens=max_tokens,
             stop=[
-                "<|UTILISATEUR|>:",
-                "<|ASSISTANT|>:",
-                "<|UTILISATEUR|>",
-                "<|ASSISTANT|>",
+                "<|user|>",
+                "<|assistant|>",
+                "</s>",
             ],
         )
         return result["choices"][0]["text"]
